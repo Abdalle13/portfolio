@@ -12,7 +12,7 @@ The project consists of a high-performance modern public portfolio website and a
 ---
 
 ## Current Development Phase
-**Phase 3: Backend Foundation**
+**Phase 4: Database Architecture**
 
 ## Completed Phases
 - **Phase 1: Project Setup and Foundation**
@@ -49,53 +49,81 @@ The project consists of a high-performance modern public portfolio website and a
   - Health check endpoint `GET /api/health` returning system uptime, status, and environment metadata.
   - Verified compilation (`tsc`) with 0 errors and runtime smoke-tested endpoints on port 5000.
 
+- **Phase 4: Database Architecture**
+  - Installed `mongoose` and `bcrypt` with full TypeScript definitions.
+  - Implemented Mongoose connection manager (`backend/src/config/database.ts`) with connection logging, error handling, and graceful shutdown integration.
+  - Built 8 Mongoose models and schemas conforming strictly to Section 22 specifications:
+    - **Admin:** `name`, `email` (unique index), `passwordHash`, `lastLogin`, `timestamps`, and `comparePassword()` method.
+    - **Profile:** Singleton model with `name`, `title`, `location`, `email`, `about`, `heroImage`, `aboutImage`, `cv`, and `timestamps`.
+    - **Project:** `title`, `slug` (unique index), `description`, `image`, `technologies`, `githubUrl`, `liveUrl`, `featured`, `published`, `order`, with compound indexes for `{ published: 1, featured: 1, order: 1 }`.
+    - **Skill:** `name`, `category` (enum: Frontend, Backend, Database, Tools & Platforms), `icon`, `order`, `active`, with `{ category: 1, order: 1 }` and `{ active: 1 }` indexes.
+    - **Education:** `institution`, `level`, `degree`, `startYear`, `endYear`, `description`, `order`, with `{ order: 1 }` index.
+    - **Service:** `title`, `description`, `icon`, `order`, `active`, with `{ order: 1 }` and `{ active: 1 }` indexes.
+    - **Message:** `name`, `email`, `message`, `read`, `status` (enum: unread, read, archived), with `{ createdAt: -1 }` and `{ read: 1, status: 1 }` indexes.
+    - **SiteSetting:** Singleton configuration with `siteTitle`, `siteDescription`, `socialLinks`, `contactEmail`, `footerText`, `seoTitle`, `seoDescription`, and `timestamps`.
+  - Created barrel export for all models in `backend/src/models/index.ts`.
+  - Built comprehensive database seeder (`backend/src/utils/seed.ts`) and configured `npm run seed` script.
+  - Integrated `connectDatabase()` on server boot in `backend/src/server.ts` and clean `disconnectDatabase()` on exit.
+  - Successfully executed seeder against MongoDB (`localhost/abdalle_portfolio`), seeding default Admin, Profile, 18 Skills, 5 Real Projects, 3 Education Milestones, 5 Services, and Site Settings.
+  - Verified clean TypeScript build (`tsc`) with 0 errors.
+
 ## Current Branch
-`feature/backend-foundation`
+`feature/database`
 
 ## Current Implementation Status
-Both Frontend and Backend foundations are established, strictly typed, and verified. The backend provides a secure, structured REST API foundation ready for database integration.
+Database architecture is complete, typed, and populated with authentic foundational data. The backend server automatically establishes a database connection on startup.
 
-## What Was Changed in Phase 3
-- Created `backend/package.json` and `backend/package-lock.json`.
-- Created `backend/tsconfig.json` with strict type checking, Node module resolution, and output directory `dist/`.
-- Created `backend/src/config/env.ts` with typed environment variables.
-- Created `backend/src/utils/apiResponse.ts` adhering to Section 24.
-- Created `backend/src/utils/appError.ts`.
-- Created `backend/src/middleware/errorHandler.ts` and `backend/src/middleware/notFoundHandler.ts`.
-- Created `backend/src/routes/health.routes.ts` and `backend/src/routes/index.ts`.
-- Created `backend/src/app.ts` and `backend/src/server.ts`.
+## What Was Changed in Phase 4
+- Installed `mongoose`, `bcrypt`, `@types/bcrypt`.
+- Created `backend/src/config/database.ts`.
+- Created `backend/src/models/Admin.ts`.
+- Created `backend/src/models/Profile.ts`.
+- Created `backend/src/models/Project.ts`.
+- Created `backend/src/models/Skill.ts`.
+- Created `backend/src/models/Education.ts`.
+- Created `backend/src/models/Service.ts`.
+- Created `backend/src/models/Message.ts`.
+- Created `backend/src/models/SiteSetting.ts`.
+- Created `backend/src/models/index.ts`.
+- Created `backend/src/utils/seed.ts`.
+- Updated `backend/src/config/env.ts` to include admin bootstrap credentials.
+- Updated `backend/src/server.ts` to initialize and terminate MongoDB connections gracefully.
+- Updated `backend/package.json` with `npm run seed` script.
 - Updated `PROJECT_STATUS.md`.
 
 ## Important Technical Decisions
-- **Relative Path Imports in Backend:** Used clean relative imports in `backend/src/` ensuring seamless execution across both development (`tsx`) and compiled production Node (`node dist/server.js`) without runtime alias resolution mismatches.
-- **Unified Response Contract:** Enforced uniform JSON schema across all controller and error handlers:
-  - `{ success: true, message: string, data?: any }`
-  - `{ success: false, message: string, errors?: any }`
-- **Graceful Shutdown:** Configured `SIGINT` and `SIGTERM` listeners with timeout fallbacks to ensure clean process termination in containerized or cloud environments.
+- **Optimized MongoDB Indexes:** Every query-heavy path (e.g. unique project slugs, published status sorting, skill categories, message read state) is backed by dedicated Mongoose schema indexes.
+- **Singleton Document Pattern:** Profile and SiteSettings are structured as single documents, avoiding unnecessary multi-document complexity for individual portfolio ownership.
+- **Idempotent Seeder:** The database seeder (`npm run seed`) inspects existing records (`countDocuments()` / `findOne()`) so it can be safely re-run without creating duplicates or overwriting customized data.
 
-## Files Created in Phase 3
+## Files Created in Phase 4
+- `backend/src/config/database.ts`
+- `backend/src/models/Admin.ts`
+- `backend/src/models/Profile.ts`
+- `backend/src/models/Project.ts`
+- `backend/src/models/Skill.ts`
+- `backend/src/models/Education.ts`
+- `backend/src/models/Service.ts`
+- `backend/src/models/Message.ts`
+- `backend/src/models/SiteSetting.ts`
+- `backend/src/models/index.ts`
+- `backend/src/utils/seed.ts`
+
+## Files Modified in Phase 4
 - `backend/package.json`
 - `backend/package-lock.json`
-- `backend/tsconfig.json`
 - `backend/src/config/env.ts`
-- `backend/src/utils/apiResponse.ts`
-- `backend/src/utils/appError.ts`
-- `backend/src/middleware/errorHandler.ts`
-- `backend/src/middleware/notFoundHandler.ts`
-- `backend/src/routes/health.routes.ts`
-- `backend/src/routes/index.ts`
-- `backend/src/app.ts`
 - `backend/src/server.ts`
+- `PROJECT_STATUS.md`
 
 ## In Progress
-None (Phase 3 complete and verified)
+None (Phase 4 complete and verified)
 
 ## Known Issues
 None.
 
 ## Remaining Work (Phases Ahead)
-- **Phase 4:** Database Architecture (Mongoose schemas, models, indexes, connection handling, seed script)
-- **Phase 5:** Authentication (Admin auth, JWT, secure HTTP-only cookies, auth middleware)
+- **Phase 5:** Authentication (Admin auth, JWT, secure HTTP-only cookies, auth middleware, login/logout endpoints)
 - **Phase 6:** Portfolio APIs (Public & Admin CRUD endpoints for projects, skills, education, services, profile, settings, messages)
 - **Phase 7:** Public Portfolio UI (Hero, About, Skills, Projects, Education, Services, Contact, Footer, Theme toggle)
 - **Phase 8:** Admin Dashboard UI (Sidebar, Overview stats, CRUD interfaces for all resources)
@@ -109,32 +137,26 @@ None.
 - **Phase 16:** Production Deployment Preparation
 
 ## Next Recommended Phase
-**Phase 4: Database Architecture**
-- Install `mongoose` and define connection logic in `backend/src/config/database.ts`.
-- Implement Mongoose schemas and models adhering strictly to Section 22:
-  - `Admin` (name, email, passwordHash, lastLogin)
-  - `Profile` (name, title, location, email, about, heroImage, aboutImage, cv)
-  - `Project` (title, slug, description, image, technologies, githubUrl, liveUrl, featured, published, order)
-  - `Skill` (name, category, icon, order, active)
-  - `Education` (institution, level, degree, startYear, endYear, description, order)
-  - `Service` (title, description, icon, order, active)
-  - `Message` (name, email, message, read, status)
-  - `SiteSetting` (siteTitle, siteDescription, socialLinks, contactEmail, footerText, seoTitle, seoDescription)
-- Configure required indexes (e.g. email, slug, published/featured, createdAt).
-- Build a database seed script (`backend/src/utils/seed.ts`) to initialize default data.
+**Phase 5: Authentication**
+- Implement JWT generation and token verification utility (`backend/src/utils/jwt.ts`).
+- Create authentication middleware (`backend/src/middleware/auth.ts`) extracting and verifying tokens from secure HTTP-only cookies.
+- Create Auth controller and routes:
+  - `POST /api/auth/login` (rate-limited, bcrypt password check, HTTP-only secure cookie issuance)
+  - `POST /api/auth/logout` (clears cookie)
+  - `GET /api/auth/me` (returns current authenticated admin session)
+- Connect Auth routes into `/api/auth`.
 
 ## How to Run / Verify Current Implementation
 ```bash
 # In backend directory:
 cd backend
 
-# Start development server with live reload:
-npm run dev
+# Seed or verify database:
+npm run seed
 
-# Or compile and run production build:
+# Build TypeScript:
 npm run build
-node dist/server.js
 
-# Test health check:
-curl http://localhost:5000/api/health
+# Start server:
+npm run dev
 ```

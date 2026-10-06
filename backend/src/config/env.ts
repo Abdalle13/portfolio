@@ -14,5 +14,8 @@ export const env = {
   COOKIE_SECRET: process.env.COOKIE_SECRET || 'default_cookie_secret_change_in_production',
   RATE_LIMIT_WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10), // 15 mins default
   RATE_LIMIT_MAX: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),
+  ADMIN_NAME: process.env.ADMIN_NAME || 'Abdalle Hussein',
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@example.com',
+  ADMIN_INITIAL_PASSWORD: process.env.ADMIN_INITIAL_PASSWORD || 'Admin@123456',
   isProduction: process.env.NODE_ENV === 'production',
 };
