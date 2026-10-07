@@ -12,7 +12,7 @@ The project consists of a high-performance modern public portfolio website and a
 ---
 
 ## Current Development Phase
-**Phase 4: Database Architecture**
+**Phase 5: Authentication**
 
 ## Completed Phases
 - **Phase 1: Project Setup and Foundation**
@@ -67,63 +67,69 @@ The project consists of a high-performance modern public portfolio website and a
   - Successfully executed seeder against MongoDB (`localhost/abdalle_portfolio`), seeding default Admin, Profile, 18 Skills, 5 Real Projects, 3 Education Milestones, 5 Services, and Site Settings.
   - Verified clean TypeScript build (`tsc`) with 0 errors.
 
+- **Phase 5: Authentication**
+  - Installed `jsonwebtoken` and `@types/jsonwebtoken`.
+  - Created JWT signing and verification utility (`backend/src/utils/jwt.ts`) with secure HTTP-only cookie handlers (`setAuthCookie`, `clearAuthCookie`).
+  - Implemented authentication middleware (`backend/src/middleware/auth.middleware.ts`) verifying tokens from HTTP-only cookies (or Bearer header) and validating active admin state in MongoDB.
+  - Implemented request validation middleware (`backend/src/validators/auth.validator.ts`) for email format and required password inputs.
+  - Created Authentication Controller (`backend/src/controllers/auth.controller.ts`):
+    - `POST /api/auth/login`: Brute-force protected, verifies credentials against bcrypt hash, updates `lastLogin`, and dispatches HTTP-only cookie.
+    - `POST /api/auth/logout`: Clears authentication cookie.
+    - `GET /api/auth/me`: Authenticated endpoint returning active admin session profile.
+  - Added dedicated brute-force rate limiter (`loginLimiter`) on the login endpoint.
+  - Mounted authentication routes under `/api/auth` in `backend/src/routes/index.ts`.
+  - Tested runtime authentication lifecycle:
+    - Unauthenticated `/api/auth/me` returns HTTP 401.
+    - Invalid password returns HTTP 401 with generic message (`Invalid email or password.`).
+    - Valid credentials return HTTP 200 with admin payload and `auth_token` HTTP-only cookie.
+    - Authenticated `/api/auth/me` with cookie returns HTTP 200 with admin profile.
+    - `POST /api/auth/logout` clears session.
+  - Verified TypeScript compilation (`tsc`) with 0 errors.
+
 ## Current Branch
-`feature/database`
+`feature/authentication`
 
 ## Current Implementation Status
-Database architecture is complete, typed, and populated with authentic foundational data. The backend server automatically establishes a database connection on startup.
+Admin authentication is complete, secured, and verified at both compilation and runtime. The backend enforces authentication through encrypted HTTP-only cookies and bcrypt password hashing.
 
-## What Was Changed in Phase 4
-- Installed `mongoose`, `bcrypt`, `@types/bcrypt`.
-- Created `backend/src/config/database.ts`.
-- Created `backend/src/models/Admin.ts`.
-- Created `backend/src/models/Profile.ts`.
-- Created `backend/src/models/Project.ts`.
-- Created `backend/src/models/Skill.ts`.
-- Created `backend/src/models/Education.ts`.
-- Created `backend/src/models/Service.ts`.
-- Created `backend/src/models/Message.ts`.
-- Created `backend/src/models/SiteSetting.ts`.
-- Created `backend/src/models/index.ts`.
-- Created `backend/src/utils/seed.ts`.
-- Updated `backend/src/config/env.ts` to include admin bootstrap credentials.
-- Updated `backend/src/server.ts` to initialize and terminate MongoDB connections gracefully.
-- Updated `backend/package.json` with `npm run seed` script.
+## What Was Changed in Phase 5
+- Installed `jsonwebtoken` and `@types/jsonwebtoken`.
+- Created `backend/src/utils/jwt.ts`.
+- Created `backend/src/types/index.ts`.
+- Created `backend/src/middleware/auth.middleware.ts`.
+- Created `backend/src/validators/auth.validator.ts`.
+- Created `backend/src/controllers/auth.controller.ts`.
+- Created `backend/src/routes/auth.routes.ts`.
+- Mounted auth routes in `backend/src/routes/index.ts`.
+- Updated `backend/package.json` and `backend/package-lock.json`.
 - Updated `PROJECT_STATUS.md`.
 
 ## Important Technical Decisions
-- **Optimized MongoDB Indexes:** Every query-heavy path (e.g. unique project slugs, published status sorting, skill categories, message read state) is backed by dedicated Mongoose schema indexes.
-- **Singleton Document Pattern:** Profile and SiteSettings are structured as single documents, avoiding unnecessary multi-document complexity for individual portfolio ownership.
-- **Idempotent Seeder:** The database seeder (`npm run seed`) inspects existing records (`countDocuments()` / `findOne()`) so it can be safely re-run without creating duplicates or overwriting customized data.
+- **HTTP-Only Cookie Authentication:** JWT tokens are stored in `httpOnly`, `sameSite`, and `secure` (in production) cookies. This completely prevents token theft via XSS vulnerabilities in the frontend.
+- **Brute-Force Rate Limiting:** Applied a dedicated 15-minute window rate limiter on the login endpoint in addition to global IP rate limits.
+- **Generic Error Responses:** Login failures return generic `"Invalid email or password."` messages to prevent user enumeration attacks.
 
-## Files Created in Phase 4
-- `backend/src/config/database.ts`
-- `backend/src/models/Admin.ts`
-- `backend/src/models/Profile.ts`
-- `backend/src/models/Project.ts`
-- `backend/src/models/Skill.ts`
-- `backend/src/models/Education.ts`
-- `backend/src/models/Service.ts`
-- `backend/src/models/Message.ts`
-- `backend/src/models/SiteSetting.ts`
-- `backend/src/models/index.ts`
-- `backend/src/utils/seed.ts`
+## Files Created in Phase 5
+- `backend/src/utils/jwt.ts`
+- `backend/src/types/index.ts`
+- `backend/src/middleware/auth.middleware.ts`
+- `backend/src/validators/auth.validator.ts`
+- `backend/src/controllers/auth.controller.ts`
+- `backend/src/routes/auth.routes.ts`
 
-## Files Modified in Phase 4
+## Files Modified in Phase 5
 - `backend/package.json`
 - `backend/package-lock.json`
-- `backend/src/config/env.ts`
-- `backend/src/server.ts`
+- `backend/src/routes/index.ts`
 - `PROJECT_STATUS.md`
 
 ## In Progress
-None (Phase 4 complete and verified)
+None (Phase 5 complete and verified)
 
 ## Known Issues
 None.
 
 ## Remaining Work (Phases Ahead)
-- **Phase 5:** Authentication (Admin auth, JWT, secure HTTP-only cookies, auth middleware, login/logout endpoints)
 - **Phase 6:** Portfolio APIs (Public & Admin CRUD endpoints for projects, skills, education, services, profile, settings, messages)
 - **Phase 7:** Public Portfolio UI (Hero, About, Skills, Projects, Education, Services, Contact, Footer, Theme toggle)
 - **Phase 8:** Admin Dashboard UI (Sidebar, Overview stats, CRUD interfaces for all resources)
@@ -137,26 +143,37 @@ None.
 - **Phase 16:** Production Deployment Preparation
 
 ## Next Recommended Phase
-**Phase 5: Authentication**
-- Implement JWT generation and token verification utility (`backend/src/utils/jwt.ts`).
-- Create authentication middleware (`backend/src/middleware/auth.ts`) extracting and verifying tokens from secure HTTP-only cookies.
-- Create Auth controller and routes:
-  - `POST /api/auth/login` (rate-limited, bcrypt password check, HTTP-only secure cookie issuance)
-  - `POST /api/auth/logout` (clears cookie)
-  - `GET /api/auth/me` (returns current authenticated admin session)
-- Connect Auth routes into `/api/auth`.
+**Phase 6: Portfolio APIs**
+Build public and administrative REST endpoints adhering to Section 23:
+- Public endpoints:
+  - `GET /api/profile`
+  - `GET /api/projects` & `GET /api/projects/:slug`
+  - `GET /api/skills`
+  - `GET /api/education`
+  - `GET /api/services`
+  - `GET /api/settings`
+- Admin CRUD endpoints (protected with `requireAuth`):
+  - Projects: `GET`, `POST`, `PUT`, `DELETE` (`/api/admin/projects`)
+  - Skills: `GET`, `POST`, `PUT`, `DELETE` (`/api/admin/skills`)
+  - Education: `GET`, `POST`, `PUT`, `DELETE` (`/api/admin/education`)
+  - Services: `GET`, `POST`, `PUT`, `DELETE` (`/api/admin/services`)
+  - Messages: `GET`, `GET :id`, `PATCH :id/read`, `DELETE :id` (`/api/admin/messages`)
+  - Profile & Settings: `GET`, `PUT` (`/api/admin/profile`, `/api/admin/settings`)
+  - Dashboard stats: `GET /api/admin/dashboard`
 
 ## How to Run / Verify Current Implementation
 ```bash
 # In backend directory:
 cd backend
 
-# Seed or verify database:
-npm run seed
-
 # Build TypeScript:
 npm run build
 
-# Start server:
+# Start development server:
 npm run dev
+
+# Test login:
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@abdalle.dev","password":"ChangeThisPasswordInProduction123!"}'
 ```
