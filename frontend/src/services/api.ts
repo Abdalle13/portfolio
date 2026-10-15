@@ -12,6 +12,7 @@ import type {
   LoginCredentials,
   Message,
   SiteSetting,
+  MediaAsset,
 } from '@/types';
 
 // --- Axios Instance -----------------------------------------------------------
@@ -304,6 +305,31 @@ export const adminSettingsApi = {
   update: async (settings: Partial<SiteSetting>): Promise<SiteSetting> => {
     const { data } = await api.put<ApiResponse<SiteSetting>>('/admin/settings', settings);
     return data.data!;
+  },
+};
+
+// --- Admin: Media & ImageKit --------------------------------------------------
+export const adminMediaApi = {
+  getAll: async (): Promise<MediaAsset[]> => {
+    const { data } = await api.get<ApiResponse<MediaAsset[]>>('/admin/media');
+    return data.data ?? [];
+  },
+
+  upload: async (file: File, folder?: string): Promise<MediaAsset> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (folder) formData.append('folder', folder);
+
+    const { data } = await api.post<ApiResponse<MediaAsset>>('/admin/media/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return data.data!;
+  },
+
+  delete: async (fileId: string): Promise<void> => {
+    await api.delete(`/admin/media/${fileId}`);
   },
 };
 

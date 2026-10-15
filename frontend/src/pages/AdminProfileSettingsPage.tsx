@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { User, Settings, Save, CheckCircle2, Loader2 } from 'lucide-react';
-import { adminProfileApi, adminSettingsApi } from '@/services/api';
+import { User, Settings, Save, CheckCircle2, Loader2, Upload } from 'lucide-react';
+import { adminProfileApi, adminSettingsApi, adminMediaApi } from '@/services/api';
 
 export const AdminProfileSettingsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'profile' | 'settings'>('profile');
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const cvInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isUploadingCv, setIsUploadingCv] = useState(false);
 
   // Profile Query
   const { data: profile, isLoading: profileLoading } = useQuery({
@@ -109,6 +113,36 @@ export const AdminProfileSettingsPage: React.FC = () => {
       setTimeout(() => setSaveSuccess(false), 3000);
     },
   });
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploadingAvatar(true);
+      const uploaded = await adminMediaApi.upload(file, '/portfolio/profile');
+      setProfileForm((prev) => ({ ...prev, heroImage: uploaded.url }));
+    } catch (err: any) {
+      alert(err.message || 'Avatar upload failed.');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploadingCv(true);
+      const uploaded = await adminMediaApi.upload(file, '/portfolio/cv');
+      setProfileForm((prev) => ({ ...prev, cv: uploaded.url }));
+    } catch (err: any) {
+      alert(err.message || 'CV upload failed.');
+    } finally {
+      setIsUploadingCv(false);
+    }
+  };
 
   const handleProfileSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -248,9 +282,36 @@ export const AdminProfileSettingsPage: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Hero Avatar / Image URL
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      Hero Avatar / Image URL
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => avatarInputRef.current?.click()}
+                      disabled={isUploadingAvatar}
+                      className="inline-flex items-center text-[11px] font-semibold text-primary-600 dark:text-primary-400 hover:underline disabled:opacity-50"
+                    >
+                      {isUploadingAvatar ? (
+                        <>
+                          <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                          <span>Uploading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-3 h-3 mr-1" />
+                          <span>Upload Avatar</span>
+                        </>
+                      )}
+                    </button>
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                    />
+                  </div>
                   <input
                     type="text"
                     value={profileForm.heroImage}
@@ -261,9 +322,36 @@ export const AdminProfileSettingsPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    CV / Resume File URL
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      CV / Resume File URL
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => cvInputRef.current?.click()}
+                      disabled={isUploadingCv}
+                      className="inline-flex items-center text-[11px] font-semibold text-primary-600 dark:text-primary-400 hover:underline disabled:opacity-50"
+                    >
+                      {isUploadingCv ? (
+                        <>
+                          <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                          <span>Uploading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-3 h-3 mr-1" />
+                          <span>Upload Document</span>
+                        </>
+                      )}
+                    </button>
+                    <input
+                      ref={cvInputRef}
+                      type="file"
+                      accept="application/pdf,image/*"
+                      onChange={handleCvUpload}
+                      className="hidden"
+                    />
+                  </div>
                   <input
                     type="text"
                     value={profileForm.cv}

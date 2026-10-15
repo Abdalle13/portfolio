@@ -8,6 +8,7 @@ import {
   Briefcase,
   Mail,
   User,
+  Image as ImageIcon,
   ExternalLink,
   LogOut,
   Sun,
@@ -23,6 +24,7 @@ const adminNavItems = [
   { name: 'Education', href: '/admin/education', icon: GraduationCap },
   { name: 'Services', href: '/admin/services', icon: Briefcase },
   { name: 'Messages', href: '/admin/messages', icon: Mail },
+  { name: 'Media Library', href: '/admin/media', icon: ImageIcon },
   { name: 'Profile & Settings', href: '/admin/profile', icon: User },
 ];
 

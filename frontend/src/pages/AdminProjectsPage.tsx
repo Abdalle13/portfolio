@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   FolderGit2,
@@ -11,8 +11,9 @@ import {
   Search,
   X,
   Loader2,
+  Upload,
 } from 'lucide-react';
-import { adminProjectsApi } from '@/services/api';
+import { adminProjectsApi, adminMediaApi } from '@/services/api';
 import type { Project } from '@/types';
 
 export const AdminProjectsPage: React.FC = () => {
@@ -20,6 +21,8 @@ export const AdminProjectsPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -118,6 +121,21 @@ export const AdminProjectsPage: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingProject(null);
+  };
+
+  const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const uploaded = await adminMediaApi.upload(file, '/portfolio/projects');
+      setFormData((prev) => ({ ...prev, image: uploaded.url }));
+    } catch (err: any) {
+      alert(err.message || 'Image upload failed.');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -404,9 +422,36 @@ export const AdminProjectsPage: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Image / Screenshot URL
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      Image / Screenshot URL
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
+                      className="inline-flex items-center text-[11px] font-semibold text-primary-600 dark:text-primary-400 hover:underline disabled:opacity-50"
+                    >
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                          <span>Uploading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-3 h-3 mr-1" />
+                          <span>Upload File</span>
+                        </>
+                      )}
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageFileChange}
+                      className="hidden"
+                    />
+                  </div>
                   <input
                     type="text"
                     value={formData.image}

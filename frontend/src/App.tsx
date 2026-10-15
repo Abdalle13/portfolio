@@ -14,6 +14,7 @@ import { AdminEducationPage } from '@/pages/AdminEducationPage';
 import { AdminServicesPage } from '@/pages/AdminServicesPage';
 import { AdminMessagesPage } from '@/pages/AdminMessagesPage';
 import { AdminProfileSettingsPage } from '@/pages/AdminProfileSettingsPage';
+import { AdminMediaPage } from '@/pages/AdminMediaPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 const queryClient = new QueryClient({
@@ -65,6 +66,7 @@ export const App: React.FC = () => {
                 <Route path="education" element={<AdminEducationPage />} />
                 <Route path="services" element={<AdminServicesPage />} />
                 <Route path="messages" element={<AdminMessagesPage />} />
+                <Route path="media" element={<AdminMediaPage />} />
                 <Route path="profile" element={<AdminProfileSettingsPage />} />
                 <Route path="settings" element={<AdminProfileSettingsPage />} />
                 <Route path="*" element={<Navigate to="/admin" replace />} />

@@ -108,7 +108,10 @@ export interface MessageFormData {
   name: string;
   email: string;
   message: string;
+  website?: string;
+  honeypot?: string;
 }
+
 
 // --- Site Setting ------------------------------------------------------------
 export interface SocialLinks {
@@ -129,6 +132,17 @@ export interface SiteSetting {
   seoDescription: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+// --- Media Asset -------------------------------------------------------------
+export interface MediaAsset {
+  fileId: string;
+  name: string;
+  url: string;
+  thumbnailUrl?: string;
+  size: number;
+  fileType: string;
+  createdAt?: string;
 }
 
 // --- Dashboard Stats ---------------------------------------------------------
