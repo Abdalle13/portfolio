@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import request from 'supertest';
 import bcrypt from 'bcrypt';
 import { createApp } from '../src/app';

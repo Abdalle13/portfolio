@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../src/app';
 import { setupTestDB } from './setup';
