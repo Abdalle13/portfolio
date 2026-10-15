@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Message } from '../models/Message';
 import { sendSuccess, sendError } from '../utils/apiResponse';
+import { sendContactNotification } from '../services/mail.service';
 
 /**
  * Admin: Get messages with optional filtering
@@ -107,30 +108,76 @@ export const deleteMessage = async (req: Request, res: Response): Promise<Respon
  */
 export const createPublicMessage = async (req: Request, res: Response): Promise<Response> => {
   try {
-    const { name, email, message } = req.body;
+    const { name, email, message, honeypot, website } = req.body;
 
-    if (!name || !email || !message) {
-      return sendError(res, 400, 'Name, email, and message are required.');
+    // Honeypot check: Bots usually auto-fill hidden input fields
+    if (honeypot || website) {
+      console.warn('[Message Controller] Honeypot field triggered. Silently ignoring bot submission.');
+      return sendSuccess(res, 201, 'Your message has been received! Thank you for reaching out.', {
+        id: 'mock-bot-id',
+      });
+    }
+
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      return sendError(res, 400, 'Please provide your name.');
+    }
+
+    if (!email || typeof email !== 'string' || !email.trim()) {
+      return sendError(res, 400, 'Please provide your email address.');
+    }
+
+    if (!message || typeof message !== 'string' || !message.trim()) {
+      return sendError(res, 400, 'Please provide a message.');
+    }
+
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedMessage = message.trim();
+
+    if (trimmedName.length > 100) {
+      return sendError(res, 400, 'Name must be under 100 characters.');
+    }
+
+    if (trimmedMessage.length < 5) {
+      return sendError(res, 400, 'Message must be at least 5 characters long.');
+    }
+
+    if (trimmedMessage.length > 5000) {
+      return sendError(res, 400, 'Message cannot exceed 5000 characters.');
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(trimmedEmail)) {
       return sendError(res, 400, 'Please provide a valid email address.');
     }
 
+    // 1. Save message to MongoDB
     const newMessage = await Message.create({
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      message: message.trim(),
+      name: trimmedName,
+      email: trimmedEmail,
+      message: trimmedMessage,
       read: false,
       status: 'unread',
+    });
+
+    // 2. Dispatch email notification asynchronously (non-blocking)
+    sendContactNotification({
+      id: newMessage._id.toString(),
+      name: newMessage.name,
+      email: newMessage.email,
+      message: newMessage.message,
+      createdAt: newMessage.createdAt,
+    }).catch((err) => {
+      console.error('[Message Controller] Error dispatching mail notification:', err);
     });
 
     return sendSuccess(res, 201, 'Your message has been received! Thank you for reaching out.', {
       id: newMessage._id,
     });
   } catch (error) {
+    console.error('[Message Controller] Failed to create message:', error);
     return sendError(res, 500, 'Failed to send message. Please try again later.');
   }
 };
+
 

@@ -34,6 +34,13 @@ import {
 import { getProfile, updateProfile } from '../controllers/profile.controller';
 import { getSettings, updateSettings } from '../controllers/setting.controller';
 import { getDashboardStats } from '../controllers/dashboard.controller';
+import {
+  getMediaAuth,
+  uploadMedia,
+  getMediaList,
+  deleteMedia,
+  uploadMiddleware,
+} from '../controllers/media.controller';
 
 const router = Router();
 
@@ -81,5 +88,11 @@ router.put('/profile', updateProfile);
 // 8. Site Settings
 router.get('/settings', getSettings);
 router.put('/settings', updateSettings);
+
+// 9. Media & ImageKit Storage
+router.get('/media', getMediaList);
+router.get('/media/auth', getMediaAuth);
+router.post('/media/upload', uploadMiddleware.single('file'), uploadMedia);
+router.delete('/media/:fileId', deleteMedia);
 
 export const adminRoutes = router;
