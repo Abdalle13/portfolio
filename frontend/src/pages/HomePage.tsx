@@ -47,6 +47,25 @@ export const HomePage: React.FC = () => {
     queryFn: servicesApi.getAll,
   });
 
+  // Dynamically synchronize document title & SEO meta description from CMS settings
+  React.useEffect(() => {
+    if (settings) {
+      if (settings.seoTitle || settings.siteTitle) {
+        document.title = settings.seoTitle || settings.siteTitle;
+      }
+      if (settings.seoDescription || settings.siteDescription) {
+        let metaDesc = document.querySelector('meta[name="description"]');
+        if (!metaDesc) {
+          metaDesc = document.createElement('meta');
+          metaDesc.setAttribute('name', 'description');
+          document.head.appendChild(metaDesc);
+        }
+        metaDesc.setAttribute('content', settings.seoDescription || settings.siteDescription);
+      }
+    }
+  }, [settings]);
+
+
   return (
     <div className="space-y-4">
       {/* 1. Hero Section */}

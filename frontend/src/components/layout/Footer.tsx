@@ -1,5 +1,7 @@
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { ArrowUp, Github, Linkedin, Instagram, Video, Mail, MapPin } from 'lucide-react';
+import { settingsApi, profileApi } from '@/services/api';
 
 const quickLinks = [
   { name: 'Home', href: '#home' },
@@ -11,17 +13,34 @@ const quickLinks = [
   { name: 'Contact', href: '#contact' },
 ];
 
-const socialLinks = [
-  { name: 'GitHub', href: 'https://github.com/Abdalle13', icon: Github },
-  { name: 'LinkedIn', href: 'https://linkedin.com', icon: Linkedin },
-  { name: 'Instagram', href: 'https://instagram.com', icon: Instagram },
-  { name: 'TikTok', href: 'https://tiktok.com', icon: Video },
-];
-
 export const Footer: React.FC = () => {
+  const { data: settings } = useQuery({
+    queryKey: ['settings'],
+    queryFn: settingsApi.get,
+  });
+
+  const { data: profile } = useQuery({
+    queryKey: ['profile'],
+    queryFn: profileApi.get,
+  });
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const contactEmail = settings?.contactEmail || profile?.email || 'contact@abdalle.dev';
+  const location = profile?.location || 'Mogadishu, Somalia';
+  const bio =
+    settings?.footerText ||
+    'Computer Science graduate and Full-Stack Developer focused on building practical, reliable web applications that solve real-world problems.';
+  const authorName = profile?.name || 'Abdalle Hussein';
+
+  const socialLinks = [
+    { name: 'GitHub', href: settings?.socialLinks?.github || 'https://github.com/Abdalle13', icon: Github },
+    { name: 'LinkedIn', href: settings?.socialLinks?.linkedin || 'https://linkedin.com', icon: Linkedin },
+    { name: 'Instagram', href: settings?.socialLinks?.instagram || 'https://instagram.com', icon: Instagram },
+    { name: 'TikTok', href: settings?.socialLinks?.tiktok || 'https://tiktok.com', icon: Video },
+  ];
 
   return (
     <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 transition-colors">
@@ -33,20 +52,20 @@ export const Footer: React.FC = () => {
               Abdalle<span className="text-primary-600">.</span>
             </a>
             <p className="text-sm text-slate-600 dark:text-slate-400 max-w-sm leading-relaxed">
-              Computer Science graduate and Full-Stack Developer focused on building practical, reliable web applications that solve real-world problems.
+              {bio}
             </p>
             <div className="flex flex-col space-y-2 pt-2 text-sm text-slate-600 dark:text-slate-400">
               <div className="flex items-center space-x-2">
                 <MapPin className="w-4 h-4 text-primary-600 shrink-0" />
-                <span>Mogadishu, Somalia</span>
+                <span>{location}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4 text-primary-600 shrink-0" />
                 <a
-                  href="mailto:contact@abdalle.dev"
+                  href={`mailto:${contactEmail}`}
                   className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                 >
-                  contact@abdalle.dev
+                  {contactEmail}
                 </a>
               </div>
             </div>
@@ -106,7 +125,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-500 space-y-4 sm:space-y-0">
-          <p>© {new Date().getFullYear()} Abdalle Hussein. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} {authorName}. All rights reserved.</p>
           <div className="flex items-center space-x-6">
             <span>Built with React, TypeScript & Tailwind CSS</span>
           </div>
