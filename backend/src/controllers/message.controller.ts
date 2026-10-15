@@ -100,3 +100,37 @@ export const deleteMessage = async (req: Request, res: Response): Promise<Respon
     return sendError(res, 500, 'Failed to delete message.');
   }
 };
+
+/**
+ * Public: Send contact message
+ * POST /api/contact
+ */
+export const createPublicMessage = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { name, email, message } = req.body;
+
+    if (!name || !email || !message) {
+      return sendError(res, 400, 'Name, email, and message are required.');
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return sendError(res, 400, 'Please provide a valid email address.');
+    }
+
+    const newMessage = await Message.create({
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      message: message.trim(),
+      read: false,
+      status: 'unread',
+    });
+
+    return sendSuccess(res, 201, 'Your message has been received! Thank you for reaching out.', {
+      id: newMessage._id,
+    });
+  } catch (error) {
+    return sendError(res, 500, 'Failed to send message. Please try again later.');
+  }
+};
+
