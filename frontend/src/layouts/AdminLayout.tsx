@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   FolderGit2,
@@ -8,14 +8,13 @@ import {
   Briefcase,
   Mail,
   User,
-  Image as ImageIcon,
-  Settings,
   ExternalLink,
   LogOut,
   Sun,
   Moon,
 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
+import { useAuth } from '@/context/AuthContext';
 
 const adminNavItems = [
   { name: 'Overview', href: '/admin', icon: LayoutDashboard },
@@ -24,18 +23,21 @@ const adminNavItems = [
   { name: 'Education', href: '/admin/education', icon: GraduationCap },
   { name: 'Services', href: '/admin/services', icon: Briefcase },
   { name: 'Messages', href: '/admin/messages', icon: Mail },
-  { name: 'Profile', href: '/admin/profile', icon: User },
-  { name: 'Media', href: '/admin/media', icon: ImageIcon },
-  { name: 'Settings', href: '/admin/settings', icon: Settings },
+  { name: 'Profile & Settings', href: '/admin/profile', icon: User },
 ];
 
 export const AdminLayout: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const { logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleLogout = () => {
-    // Auth logout handler will be wired in Phase 5
-    navigate('/admin/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } finally {
+      navigate('/admin/login');
+    }
   };
 
   return (
@@ -61,13 +63,22 @@ export const AdminLayout: React.FC = () => {
           <nav className="p-4 space-y-1">
             {adminNavItems.map((item) => {
               const Icon = item.icon;
+              const isActive =
+                item.href === '/admin'
+                  ? location.pathname === '/admin'
+                  : location.pathname.startsWith(item.href);
+
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+                  className={`flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                    isActive
+                      ? 'bg-primary-50 dark:bg-primary-950/60 text-primary-600 dark:text-primary-400 border border-primary-200/60 dark:border-primary-800/60'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                  }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-4 h-4 shrink-0" />
                   <span>{item.name}</span>
                 </Link>
               );
@@ -81,7 +92,7 @@ export const AdminLayout: React.FC = () => {
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+            className="flex items-center justify-between px-3 py-2 rounded-xl text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
           >
             <span className="flex items-center space-x-2">
               <ExternalLink className="w-4 h-4 text-primary-600" />
@@ -90,7 +101,7 @@ export const AdminLayout: React.FC = () => {
           </a>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+            className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-sm font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
           >
             <LogOut className="w-4 h-4" />
             <span>Logout</span>
@@ -117,6 +128,29 @@ export const AdminLayout: React.FC = () => {
               Website
             </Link>
           </div>
+        </div>
+
+        {/* Mobile Subnav Scroll */}
+        <div className="md:hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2 flex items-center space-x-2 overflow-x-auto">
+          {adminNavItems.map((item) => {
+            const isActive =
+              item.href === '/admin'
+                ? location.pathname === '/admin'
+                : location.pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold ${
+                  isActive
+                    ? 'bg-primary-600 text-white'
+                    : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800'
+                }`}
+              >
+                {item.name}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Page Content */}

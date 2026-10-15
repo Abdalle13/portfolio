@@ -19,25 +19,16 @@ export interface PaginatedResponse<T> {
 }
 
 // --- Profile -----------------------------------------------------------------
-export interface SocialLinks {
-  github?: string;
-  linkedin?: string;
-  twitter?: string;
-  website?: string;
-}
-
 export interface Profile {
   _id: string;
   name: string;
   title: string;
-  bio: string;
+  location: string;
   email: string;
-  phone?: string;
-  location?: string;
-  avatarUrl?: string;
-  resumeUrl?: string;
-  socialLinks?: SocialLinks;
-  isActive: boolean;
+  about: string;
+  heroImage?: string;
+  aboutImage?: string;
+  cv?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -48,29 +39,27 @@ export interface Project {
   title: string;
   slug: string;
   description: string;
-  longDescription?: string;
-  techStack: string[];
-  category: string;
-  status: 'completed' | 'in-progress' | 'planned';
+  image: string;
+  technologies: string[];
+  githubUrl: string;
+  liveUrl: string;
   featured: boolean;
-  imageUrl?: string;
-  liveUrl?: string;
-  githubUrl?: string;
+  published: boolean;
   order: number;
-  isPublished: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
 // --- Skill -------------------------------------------------------------------
+export type SkillCategory = 'Frontend' | 'Backend' | 'Database' | 'Tools & Platforms';
+
 export interface Skill {
   _id: string;
   name: string;
-  category: string;
-  proficiency: number;
-  icon?: string;
+  category: SkillCategory;
+  icon: string;
   order: number;
-  isActive: boolean;
+  active: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -79,15 +68,12 @@ export interface Skill {
 export interface Education {
   _id: string;
   institution: string;
+  level: string;
   degree: string;
-  field: string;
-  startYear: number;
-  endYear?: number;
-  current: boolean;
+  startYear: string;
+  endYear: string;
   description?: string;
-  grade?: string;
   order: number;
-  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -97,24 +83,23 @@ export interface Service {
   _id: string;
   title: string;
   description: string;
-  icon?: string;
-  features: string[];
+  icon: string;
   order: number;
-  isActive: boolean;
+  active: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
 // --- Message -----------------------------------------------------------------
+export type MessageStatus = 'unread' | 'read' | 'archived';
+
 export interface Message {
   _id: string;
   name: string;
   email: string;
-  subject?: string;
   message: string;
-  isRead: boolean;
-  isReplied: boolean;
-  ipAddress?: string;
+  read: boolean;
+  status: MessageStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -122,30 +107,53 @@ export interface Message {
 export interface MessageFormData {
   name: string;
   email: string;
-  subject?: string;
   message: string;
 }
 
-// --- SiteSetting -------------------------------------------------------------
+// --- Site Setting ------------------------------------------------------------
+export interface SocialLinks {
+  github?: string;
+  linkedin?: string;
+  instagram?: string;
+  tiktok?: string;
+}
+
 export interface SiteSetting {
-  _id: string;
-  key: string;
-  value: string | boolean | number | string[];
-  type: 'string' | 'boolean' | 'number' | 'array';
-  group: string;
-  label: string;
-  description?: string;
-  updatedAt: string;
+  _id?: string;
+  siteTitle: string;
+  siteDescription: string;
+  socialLinks: SocialLinks;
+  contactEmail: string;
+  footerText: string;
+  seoTitle: string;
+  seoDescription: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // --- Dashboard Stats ---------------------------------------------------------
-export interface DashboardStats {
-  projects: number;
-  skills: number;
-  education: number;
-  services: number;
-  messages: number;
+export interface DashboardMetrics {
+  totalProjects: number;
+  publishedProjects: number;
+  featuredProjects: number;
+  totalSkills: number;
+  activeSkills: number;
+  totalEducation: number;
+  totalServices: number;
+  activeServices: number;
+  totalMessages: number;
   unreadMessages: number;
+}
+
+export interface DashboardStats {
+  metrics: DashboardMetrics;
+  recentProjects: Project[];
+  recentMessages: Message[];
+  status: {
+    portfolioOnline: boolean;
+    databaseConnected: boolean;
+    lastUpdated: string;
+  };
 }
 
 // --- Auth --------------------------------------------------------------------
@@ -153,7 +161,7 @@ export interface Admin {
   id: string;
   name: string;
   email: string;
-  role: string;
+  lastLogin?: string;
 }
 
 export interface LoginCredentials {

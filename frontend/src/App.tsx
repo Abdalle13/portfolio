@@ -8,6 +8,12 @@ import { AdminLayout } from '@/layouts/AdminLayout';
 import { HomePage } from '@/pages/HomePage';
 import { AdminLoginPage } from '@/pages/AdminLoginPage';
 import { AdminDashboardPage } from '@/pages/AdminDashboardPage';
+import { AdminProjectsPage } from '@/pages/AdminProjectsPage';
+import { AdminSkillsPage } from '@/pages/AdminSkillsPage';
+import { AdminEducationPage } from '@/pages/AdminEducationPage';
+import { AdminServicesPage } from '@/pages/AdminServicesPage';
+import { AdminMessagesPage } from '@/pages/AdminMessagesPage';
+import { AdminProfileSettingsPage } from '@/pages/AdminProfileSettingsPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 const queryClient = new QueryClient({
@@ -44,7 +50,7 @@ export const App: React.FC = () => {
               {/* Admin Authentication */}
               <Route path="/admin/login" element={<AdminLoginPage />} />
 
-              {/* Admin Dashboard */}
+              {/* Admin Dashboard CMS */}
               <Route
                 path="/admin"
                 element={
@@ -54,7 +60,14 @@ export const App: React.FC = () => {
                 }
               >
                 <Route index element={<AdminDashboardPage />} />
-                <Route path="*" element={<AdminDashboardPage />} />
+                <Route path="projects" element={<AdminProjectsPage />} />
+                <Route path="skills" element={<AdminSkillsPage />} />
+                <Route path="education" element={<AdminEducationPage />} />
+                <Route path="services" element={<AdminServicesPage />} />
+                <Route path="messages" element={<AdminMessagesPage />} />
+                <Route path="profile" element={<AdminProfileSettingsPage />} />
+                <Route path="settings" element={<AdminProfileSettingsPage />} />
+                <Route path="*" element={<Navigate to="/admin" replace />} />
               </Route>
 
               {/* 404 Catch-All */}
