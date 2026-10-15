@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { ExternalLink, Github, Sparkles, FolderGit2, ArrowUpRight } from 'lucide-react';
 import type { Project } from '@/types';
 
@@ -9,7 +10,12 @@ interface ProjectCardProps {
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) => {
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ y: -6 }}
       onClick={() => onSelect(project)}
       className="group relative flex flex-col rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 overflow-hidden shadow-sm hover:shadow-xl hover:border-primary-500/50 transition-all duration-300 cursor-pointer"
     >
@@ -88,7 +94,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
                 href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+                className="inline-flex items-center text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-md"
               >
                 <Github className="w-4 h-4 mr-1.5" />
                 <span>Code</span>
@@ -99,7 +105,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
                 href={project.liveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 transition-colors"
+                className="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-md"
               >
                 <ExternalLink className="w-4 h-4 mr-1.5" />
                 <span>Live Demo</span>
@@ -109,12 +115,12 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
 
           <button
             onClick={() => onSelect(project)}
-            className="text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+            className="text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-md"
           >
             Learn more &rarr;
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

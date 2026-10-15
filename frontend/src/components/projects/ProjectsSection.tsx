@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { ProjectCard } from './ProjectCard';
 import { ProjectModal } from './ProjectModal';
 import { Sparkles, FolderGit2 } from 'lucide-react';
@@ -13,7 +14,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects, isLo
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [filter, setFilter] = useState<'all' | 'featured'>('all');
 
-  // Fallback demo projects matching database seed if empty
+  // Fallback demo projects strictly aligned with MongoDB seed records
   const defaultProjects: Project[] = [
     {
       _id: '1',
@@ -62,32 +63,54 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects, isLo
     },
     {
       _id: '4',
-      title: 'Somali Logistics & Fleet Tracker',
-      slug: 'somali-logistics-tracker',
-      description: 'Logistics tracking interface providing delivery milestone verifications, manifest generation, and dispatcher route monitoring.',
+      title: 'SmartClinic',
+      slug: 'smartclinic',
+      description: 'Clinical operations and outpatient management software enabling doctor scheduling, patient electronic health records, and prescription tracking.',
       image: '',
-      technologies: ['React', 'TypeScript', 'Node.js', 'MongoDB', 'Leaflet'],
-      githubUrl: 'https://github.com/Abdalle13/fleet-tracker',
+      technologies: ['React', 'TypeScript', 'Node.js', 'Express', 'MongoDB', 'Tailwind CSS'],
+      githubUrl: 'https://github.com/Abdalle13/smartclinic',
+      liveUrl: '',
+      featured: true,
+      published: true,
+      order: 4,
+      createdAt: '',
+      updatedAt: '',
+    },
+    {
+      _id: '5',
+      title: 'Barwaaqo Restaurant Management System',
+      slug: 'barwaaqo-restaurant-management',
+      description: 'Full-featured hospitality solution powering point of sale (POS), kitchen order display, table reservations, and daily revenue reporting.',
+      image: '',
+      technologies: ['React', 'TypeScript', 'Node.js', 'Express', 'MongoDB'],
+      githubUrl: 'https://github.com/Abdalle13/barwaaqo-rms',
       liveUrl: '',
       featured: false,
       published: true,
-      order: 4,
+      order: 5,
       createdAt: '',
       updatedAt: '',
     },
   ];
 
   const sourceProjects = projects.length > 0 ? projects : defaultProjects;
-  const filteredProjects = filter === 'featured'
-    ? sourceProjects.filter((p) => p.featured)
-    : sourceProjects;
+  const filteredProjects =
+    filter === 'featured'
+      ? sourceProjects.filter((p) => p.featured)
+      : sourceProjects;
 
   return (
     <section id="projects" className="py-20 sm:py-28 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 sm:mb-16 gap-6">
-          <div className="space-y-2">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="space-y-2"
+          >
             <span className="text-xs font-semibold uppercase tracking-widest text-primary-600 dark:text-primary-400">
               Selected Portfolio
             </span>
@@ -97,13 +120,13 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects, isLo
             <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 max-w-xl">
               Production-focused web software built with modular architectures, responsive user interfaces, and robust APIs.
             </p>
-          </div>
+          </motion.div>
 
           {/* Filter Pills */}
           <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 shadow-sm shrink-0">
             <button
               onClick={() => setFilter('all')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                 filter === 'all'
                   ? 'bg-primary-600 text-white shadow-sm'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
@@ -113,7 +136,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects, isLo
             </button>
             <button
               onClick={() => setFilter('featured')}
-              className={`inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                 filter === 'featured'
                   ? 'bg-primary-600 text-white shadow-sm'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'

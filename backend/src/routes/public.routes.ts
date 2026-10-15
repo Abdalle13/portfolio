@@ -7,6 +7,7 @@ import { getPublicServices } from '../controllers/service.controller';
 import { getSettings } from '../controllers/setting.controller';
 import { createPublicMessage } from '../controllers/message.controller';
 import { contactLimiter } from '../middleware/rateLimiter';
+import { validateContact } from '../validators/contact.validator';
 
 const router = Router();
 
@@ -18,8 +19,8 @@ router.get('/skills', getPublicSkills);
 router.get('/education', getPublicEducation);
 router.get('/services', getPublicServices);
 router.get('/settings', getSettings);
-router.post('/contact', contactLimiter, createPublicMessage);
+
+// Contact: rate-limit → Zod validation → controller
+router.post('/contact', contactLimiter, validateContact, createPublicMessage);
 
 export const publicRoutes = router;
-
-

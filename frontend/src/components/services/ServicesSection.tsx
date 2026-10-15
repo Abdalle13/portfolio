@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Code, Globe, Database, ShieldCheck, Zap, ArrowRight } from 'lucide-react';
 import type { Service } from '@/types';
 
@@ -65,7 +66,13 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, isLo
     <section id="services" className="py-20 sm:py-28 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="space-y-2 mb-12 sm:mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="space-y-2 mb-12 sm:mb-16"
+        >
           <span className="text-xs font-semibold uppercase tracking-widest text-primary-600 dark:text-primary-400">
             Offerings & Capabilities
           </span>
@@ -75,7 +82,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, isLo
           <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 max-w-xl">
             Reliable engineering services tailored for modern startups, academic organizations, and business ventures.
           </p>
-        </div>
+        </motion.div>
 
         {/* Services Grid */}
         {isLoading ? (
@@ -91,8 +98,13 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, isLo
               const formattedNumber = String(index + 1).padStart(2, '0');
 
               return (
-                <div
+                <motion.div
                   key={service._id || service.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  whileHover={{ y: -6 }}
                   className="group relative rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-8 shadow-sm hover:shadow-xl hover:border-primary-500/50 transition-all duration-300 flex flex-col justify-between space-y-6"
                 >
                   <div className="space-y-4">
@@ -121,13 +133,13 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, isLo
                     </span>
                     <a
                       href="#contact"
-                      className="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 transition-colors"
+                      className="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-md"
                     >
                       <span>Inquire now</span>
                       <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform group-hover:translate-x-1" />
                     </a>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
