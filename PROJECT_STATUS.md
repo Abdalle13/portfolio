@@ -12,7 +12,8 @@ The project consists of a high-performance modern public portfolio website and a
 ---
 
 ## Current Development Phase
-**Phase 6: Portfolio APIs**
+**Phase 15: Performance, SEO & Accessibility — COMPLETE**
+
 
 ## Completed Phases
 - **Phase 1: Project Setup and Foundation**
@@ -31,7 +32,7 @@ The project consists of a high-performance modern public portfolio website and a
   - Built sticky, glassmorphism `Navbar` with smooth scrolling, active section tracking, theme toggle, and responsive mobile menu.
   - Built comprehensive `Footer` with location (Mogadishu, Somalia), contact email, quick links, social media links (Lucide React icons), back-to-top button, and no public phone number.
   - Implemented `RootLayout` for the public portfolio and `AdminLayout` with sidebar navigation for the administrative portal.
-  - Scaffolded foundational pages: `HomePage` (with semantic sections for `#home`, `#about`, `#skills`, `#projects`, `#education`, `#services`, `#contact`), `AdminLoginPage`, `AdminDashboardPage`, and `NotFoundPage`.
+  - Scaffolded foundational pages: `HomePage`, `AdminLoginPage`, `AdminDashboardPage`, and `NotFoundPage`.
   - Configured React Router DOM and TanStack Query `QueryClientProvider`.
   - Verified clean TypeScript build (`tsc && vite build`) with 0 errors.
 
@@ -104,100 +105,233 @@ The project consists of a high-performance modern public portfolio website and a
     - Messages: `GET`, `GET :id`, `PATCH :id/read`, `DELETE :id` (`/api/admin/messages`).
     - Profile & Settings: `GET`, `PUT` (`/api/admin/profile`, `/api/admin/settings`).
     - Dashboard: `GET /api/admin/dashboard` computing real database metrics (total projects, published, featured, skills, education, services, unread inquiries, recent items).
-  - Executed automated integration suite verifying:
-    - All 7 public endpoints return HTTP 200.
-    - Unauthenticated access to `/api/admin/dashboard` is blocked with HTTP 401.
-    - Admin login issues valid HTTP-only cookie.
-    - Admin can view real dashboard metrics.
-    - Admin can create, update, and delete projects.
+  - Executed automated integration suite.
   - Verified clean TypeScript compilation (`tsc`) with 0 errors.
+
+- **Phase 7: Public Portfolio UI**
+  - Synchronized frontend TypeScript interfaces (`frontend/src/types/index.ts`) strictly with backend Mongoose models (`Profile`, `Project`, `Skill`, `Education`, `Service`, `Message`, `SiteSetting`, `DashboardStats`).
+  - Updated API client integration layer (`frontend/src/services/api.ts`) connecting to standard backend endpoints (`/profile`, `/projects`, `/skills`, `/education`, `/services`, `/settings`, `/contact`).
+  - Implemented public contact submission endpoint `POST /api/contact` in `backend/src/controllers/message.controller.ts` and mounted in `backend/src/routes/public.routes.ts`.
+  - Built modular, aesthetic public components:
+    - `HeroSection.tsx`: Dynamic profile, status badges ("Available for hire", "Mogadishu, Somalia", "JUST Alum"), modern gradients, CTA buttons (View Projects, Get in Touch, Download CV), and social links.
+    - `AboutSection.tsx`: Clean 2-column narrative, Jamhuriya University academic background, engineering pillars, and CV download.
+    - `SkillsSection.tsx`: Category filtering, badges across Frontend, Backend, Database, and Tools & Platforms.
+    - `ProjectsSection.tsx`, `ProjectCard.tsx`, `ProjectModal.tsx`: Real project showcases with interactive card hover zoom, tags, live demo & GitHub buttons, and modal dialog with full specs.
+    - `EducationSection.tsx`: Chronological timeline showcasing BSc in Computer Science at JUST, course highlights, and verified badges.
+    - `ServicesSection.tsx`: Modern numbered cards with icons and capabilities.
+    - `ContactSection.tsx`: Direct contact info, SLA response badge, and interactive message form with TanStack mutation, validation, and real MongoDB submission.
+  - Refactored `HomePage.tsx` to assemble all modular sections with TanStack Query caching.
+  - Verified production build (`tsc && vite build`) with 0 errors.
+
+- **Phase 8: Admin Dashboard UI**
+  - Fully overhauled `AdminDashboardPage.tsx` with real-time statistics cards (Total & Published Projects, Active Skills, Education Entries, Active Services, Unread Messages), recent projects feed, recent inquiries feed, and system health status.
+  - Built comprehensive administrative CRUD pages:
+    - `AdminProjectsPage.tsx`: Projects table, search by title/tech, Add/Edit Project modal, delete confirmation, and direct toggles for featured/published flags.
+    - `AdminSkillsPage.tsx`: Categorized grid view, Add/Edit Skill modal, order adjustment, and active visibility toggles.
+    - `AdminEducationPage.tsx`: Academic degrees timeline table, Add/Edit Education modal, start/end year validation, and delete action.
+    - `AdminServicesPage.tsx`: Services cards, Add/Edit Service modal, and active toggles.
+    - `AdminMessagesPage.tsx`: Inquiry inbox with folder filters (All, Unread, Read, Archived), message detail modal, mark read/unread, archive toggle, and direct mailto reply link.
+    - `AdminProfileSettingsPage.tsx`: Unified tabbed management interface for updating personal profile bio/location/CV and site settings (social links, contact email, SEO title/description).
+  - Enhanced `AdminLayout.tsx` with active route highlighting, responsive mobile drawer navigation, and real authenticated logout integration via `useAuth().logout()`.
+  - Configured nested protected routes in `frontend/src/App.tsx`.
+  - Verified clean TypeScript compilation and production build (`tsc && vite build`) with 0 errors.
+
+---
 
 ## Current Branch
 `feature/portfolio-api`
 
 ## Current Implementation Status
-All public and administrative CRUD APIs are implemented, strictly typed, secured, and thoroughly verified. The backend is completely ready to supply dynamic data to the frontend.
+Phase 7 (Public Portfolio UI) and Phase 8 (Admin Dashboard UI) are fully implemented, strictly typed, and verified with 0 build errors across both frontend and backend. Both public consumers and authenticated admin users have complete, production-grade interfaces.
 
-## What Was Changed in Phase 6
-- Created `backend/src/utils/slugify.ts`.
-- Created `backend/src/controllers/project.controller.ts`.
-- Created `backend/src/controllers/skill.controller.ts`.
-- Created `backend/src/controllers/education.controller.ts`.
-- Created `backend/src/controllers/service.controller.ts`.
-- Created `backend/src/controllers/profile.controller.ts`.
-- Created `backend/src/controllers/setting.controller.ts`.
-- Created `backend/src/controllers/message.controller.ts`.
-- Created `backend/src/controllers/dashboard.controller.ts`.
-- Created `backend/src/routes/public.routes.ts`.
-- Created `backend/src/routes/admin.routes.ts`.
-- Updated `backend/src/routes/index.ts` to mount public and admin routes.
-- Updated `PROJECT_STATUS.md`.
+---
 
-## Important Technical Decisions
-- **Unified Domain Controllers:** Controllers encapsulate both public retrieval and administrative CRUD actions with clear separation of permissions (`requireAuth`).
-- **Slug Generation & Collision Handling:** Slugs are automatically generated via `slugify()` on creation if not provided and checked for uniqueness across MongoDB.
-- **Zero Fake Analytics:** The `/api/admin/dashboard` endpoint calculates real numbers directly from MongoDB collections via `Promise.all([countDocuments(), ...])`.
+## What Was Changed in Phases 7 & 8
+- Updated `frontend/src/types/index.ts` to strictly mirror backend Mongoose schemas.
+- Updated `frontend/src/services/api.ts` with correct public endpoints and complete admin CRUD client functions.
+- Implemented `POST /api/contact` in `backend/src/controllers/message.controller.ts` and mounted in `backend/src/routes/public.routes.ts`.
+- Created `frontend/src/components/home/HeroSection.tsx`.
+- Created `frontend/src/components/about/AboutSection.tsx`.
+- Created `frontend/src/components/skills/SkillsSection.tsx`.
+- Created `frontend/src/components/projects/ProjectsSection.tsx`.
+- Created `frontend/src/components/projects/ProjectCard.tsx`.
+- Created `frontend/src/components/projects/ProjectModal.tsx`.
+- Created `frontend/src/components/education/EducationSection.tsx`.
+- Created `frontend/src/components/services/ServicesSection.tsx`.
+- Created `frontend/src/components/contact/ContactSection.tsx`.
+- Refactored `frontend/src/pages/HomePage.tsx`.
+- Overhauled `frontend/src/pages/AdminDashboardPage.tsx`.
+- Created `frontend/src/pages/AdminProjectsPage.tsx`.
+- Created `frontend/src/pages/AdminSkillsPage.tsx`.
+- Created `frontend/src/pages/AdminEducationPage.tsx`.
+- Created `frontend/src/pages/AdminServicesPage.tsx`.
+- Created `frontend/src/pages/AdminMessagesPage.tsx`.
+- Created `frontend/src/pages/AdminProfileSettingsPage.tsx`.
+- Updated `frontend/src/layouts/AdminLayout.tsx`.
+- Updated `frontend/src/App.tsx` with complete admin routing.
+- Verified TypeScript compilation and bundle generation for both frontend and backend.
 
-## Files Created in Phase 6
-- `backend/src/utils/slugify.ts`
-- `backend/src/controllers/project.controller.ts`
-- `backend/src/controllers/skill.controller.ts`
-- `backend/src/controllers/education.controller.ts`
-- `backend/src/controllers/service.controller.ts`
-- `backend/src/controllers/profile.controller.ts`
-- `backend/src/controllers/setting.controller.ts`
-- `backend/src/controllers/message.controller.ts`
-- `backend/src/controllers/dashboard.controller.ts`
-- `backend/src/routes/public.routes.ts`
-- `backend/src/routes/admin.routes.ts`
+- **Phase 9: Media Management**
+  - Installed and configured `imagekit` and `multer` with TypeScript types.
+  - Built ImageKit configuration module (`backend/src/config/imagekit.ts`) supporting public/private keys and CDN URL endpoint with local upload fallback.
+  - Created media controller (`backend/src/controllers/media.controller.ts`):
+    - `POST /api/admin/media/upload`: validates file types (JPEG, PNG, WebP, SVG, GIF, PDF) and max size (10MB), uploads to ImageKit with unique names and folders.
+    - `GET /api/admin/media`: fetches CDN file list.
+    - `GET /api/admin/media/auth`: returns secure client authentication parameters.
+    - `DELETE /api/admin/media/:fileId`: removes assets from ImageKit storage.
+  - Mounted media routes in `backend/src/routes/admin.routes.ts` and enabled static asset serving in `backend/src/app.ts`.
+  - Added `MediaAsset` interface in `frontend/src/types/index.ts`.
+  - Added `adminMediaApi` in `frontend/src/services/api.ts` (`getAll`, `upload`, `delete`).
+  - Built dedicated Media Library CMS page (`frontend/src/pages/AdminMediaPage.tsx`):
+    - Drag-and-drop file upload zone with file validation and animated progress.
+    - Media grid with image thumbnails, file size formatting, file type badges, copy URL to clipboard with confirmation toast, and delete confirmation dialog.
+    - Image inspection modal for full-resolution view.
+  - Integrated direct media upload buttons inside:
+    - `AdminProjectsPage.tsx`: upload project screenshots directly to ImageKit and auto-populate URL.
+    - `AdminProfileSettingsPage.tsx`: upload hero avatar image and CV/Resume document directly to ImageKit.
+  - Added `Media Library` link with icon to `AdminLayout.tsx` and mounted route in `frontend/src/App.tsx`.
+  - Verified clean TypeScript build (`tsc && vite build`) with 0 errors across frontend and backend.
 
-## Files Modified in Phase 6
-- `backend/src/routes/index.ts`
-- `PROJECT_STATUS.md`
+---
 
-## In Progress
-None (Phase 6 complete and verified)
+## Current Branch
+`feature/portfolio-api`
 
-## Known Issues
-None.
+## Current Implementation Status
+Phase 9 (Media Management) is complete. The application can seamlessly upload and deliver media files via ImageKit CDN (with offline local fallback during local development), manage assets via the dedicated Media Library, and upload media directly from project and profile editing forms.
+
+---
+
+## What Was Changed in Phase 9
+- Installed `imagekit`, `multer`, `@types/multer` in `backend`.
+- Created `backend/src/config/imagekit.ts`.
+- Created `backend/src/controllers/media.controller.ts`.
+- Updated `backend/src/config/env.ts` with ImageKit and SMTP keys.
+- Updated `backend/src/app.ts` to serve `/uploads`.
+- Updated `backend/src/routes/admin.routes.ts` with media endpoints.
+- Added `MediaAsset` in `frontend/src/types/index.ts`.
+- Added `adminMediaApi` in `frontend/src/services/api.ts`.
+- Created `frontend/src/pages/AdminMediaPage.tsx`.
+- Updated `frontend/src/layouts/AdminLayout.tsx` with Media Library nav item.
+- Updated `frontend/src/App.tsx` with `/admin/media` route.
+- Updated `frontend/src/pages/AdminProjectsPage.tsx` with screenshot upload button.
+- Updated `frontend/src/pages/AdminProfileSettingsPage.tsx` with avatar & CV upload buttons.
+
+- **Phase 10: Contact & Email System**
+  - Installed and configured `nodemailer` and `@types/nodemailer`.
+  - Created mailer configuration module (`backend/src/config/mailer.ts`) with SMTP transport management and live/simulation configuration detector.
+  - Built mail notification service (`backend/src/services/mail.service.ts`):
+    - Branded, responsive HTML and plain-text email templates with Abdalle's palette (Slate `#0F172A`, Primary `#2563EB`).
+    - Configured automatic `Reply-To` directly targeting the inquiring visitor.
+    - Seamless simulation fallback for offline local development without credentials.
+  - Built dedicated contact rate limiting middleware (`backend/src/middleware/rateLimiter.ts`) enforcing max 5 contact submissions per 15-minute window per IP.
+  - Implemented anti-spam honeypot defense in `backend/src/controllers/message.controller.ts` (silently drops bot submissions targeting hidden fields without polluting database or email inbox).
+  - Streamlined `frontend/src/components/contact/ContactSection.tsx`:
+    - Clean, focused contact form with Name, Email, Message, and hidden honeypot field.
+    - Preserved contact details (Email, Location) exclusively in the global `Footer.tsx` without redundant cards in the contact section.
+    - No public phone numbers displayed anywhere.
+  - Verified live SMTP delivery to `NOTIFICATION_EMAIL` and tested non-blocking async notification dispatch.
+  - Verified clean compilation with 0 errors across frontend (`tsc && vite build`) and backend (`tsc`).
+
+- **Phase 11: Integration & End-to-End Wiring**
+  - Configured Vite development proxy in `frontend/vite.config.ts` for `/api` and `/uploads` routes pointing to `http://localhost:5000` to prevent localhost cross-origin and cookie-dropping issues.
+  - Enhanced authentication flow in `AdminLoginPage.tsx` with automatic redirection to `/admin` for sessions that are already authenticated.
+  - Enhanced route guard `ProtectedRoute` in `frontend/src/App.tsx` with a branded session verification spinner, eliminating visual flicker on page refresh.
+  - Integrated dynamic document title and SEO meta description updates in `HomePage.tsx` synchronized with CMS `settings` (title, description, and SEO tags).
+  - Wired global `Footer.tsx` dynamically to TanStack Query `settings` and `profile` queries with safe fallbacks (social links, contact email, location, bio).
+  - Enhanced `Navbar.tsx` smooth scrolling so that clicking navigation anchors from non-home paths safely transitions back to `/#section`.
+  - Normalized UTF-8 file encodings without BOM.
+  - Verified end-to-end type safety and clean production compilation across both backend (`tsc`) and frontend (`tsc && vite build`) with 0 errors.
+
+---
+
+## Current Branch
+`feature/portfolio-api`
+
+## Current Implementation Status
+Phase 11 (Integration & End-to-End Wiring) is complete and verified. The full system links public visitor flows (browsing, inquiry submission with spam filtering and email alerts, CV download, project modals) and administrative dashboard flows (authentication, media uploads, project/skill/education/service CRUD, inquiry management) with seamless data synchronization and zero build warnings.
+
+---
+
+- **Phase 12: Animations & UI Polish**
+  - Installed and verified `framer-motion` (`^12.4.7`).
+  - Added Framer Motion entrance animations, staggered reveals, and scroll-triggered viewport mounts to all public sections: `HeroSection`, `AboutSection`, `SkillsSection`, `ProjectCard`, `ProjectModal`, `ProjectsSection`, `EducationSection`, `ServicesSection`, `ContactSection`.
+  - Interactive hover micro-animations: card elevation, profile card tilt, arrow nudge, badge scale.
+  - `AnimatePresence` modal spring entrance/exit with ESC keydown handler in `ProjectModal`.
+  - Added CSS `scroll-behavior: smooth` and `@media (prefers-reduced-motion: reduce)` safeguards in `index.css`.
+  - Verified clean production compilation with 0 errors (frontend + backend).
+
+- **Phase 13: Security Hardening**
+  - **Helmet CSP**: Upgraded from default to fully tuned Content Security Policy — restricts `defaultSrc`, `scriptSrc`, `styleSrc`, `fontSrc`, `imgSrc`, `connectSrc`, `frameSrc`, `objectSrc`; enables HSTS with preload in production only.
+  - **CORS tightening**: Production mode now restricts to exact `FRONTEND_URL` only; no-origin requests blocked in production; dev still allows localhost variants.
+  - **MongoDB sanitization**: Installed `express-mongo-sanitize` — strips `$` and `.` operators from request bodies, query strings, and params to prevent NoSQL injection attacks. Sanitization events logged with path and key.
+  - **Zod input validation**: Installed `zod` (v4); created `backend/src/validators/contact.validator.ts` with strict schema (name ≤100 chars, RFC-compliant email ≤254 chars, message 5–5000 chars, honeypot fields typed optional); `validateContact` middleware replaces manual if-checks in controller.
+  - **Route validation wiring**: `POST /api/contact` pipeline updated to: `contactLimiter → validateContact → createPublicMessage`.
+  - **Controller simplification**: Removed duplicated manual validation from `message.controller.ts`; controller now trusts Zod-sanitised input.
+  - **Bundle code splitting**: Added Vite `manualChunks` in `vite.config.ts` splitting vendors (`react`, `react-dom`, `react-router-dom`, `@tanstack/react-query`, `framer-motion`, `lucide-react`) into separate cacheable chunks — eliminated chunk size warnings.
+  - Verified clean TypeScript compilation (`tsc --noEmit`) and production build (`vite build`) with 0 errors across both backend and frontend.
+
+---
+
+## Current Branch
+`feature/portfolio-api`
+
+## Current Implementation Status
+Phase 13 (Security Hardening) is complete and verified. The API is now protected by a strict CSP, production-only CORS origin enforcement, NoSQL injection sanitization, and Zod-validated contact input. The frontend bundle is cleanly split across cacheable vendor chunks.
+
+- **Phase 14: Testing & Quality Assurance**
+  - **Backend Test Suite (Vitest + Supertest):**
+    - Configured native `vitest.config.ts` for backend with Node.js environment and sequential test file execution (`fileParallelism: false`) to guarantee clean DB lifecycle isolation.
+    - Added npm test script: `"test": "vitest run"` in `backend/package.json`.
+    - `tests/health.test.ts`: Health check endpoint (`GET /api/health` returning 200, status `healthy`, uptime, and timestamp) and 404 route handling verification (2 tests).
+    - `tests/auth.test.ts`: Authentication lifecycle tests — invalid credentials (401), unauthorized `/api/auth/me` protection (401), valid login with HTTP-only signed JWT cookie issuance (200), and logout session destruction (200) (4 tests).
+    - `tests/public.test.ts`: Public portfolio endpoint tests — `/api/profile`, `/api/projects`, `/api/projects/:slug`, 404 unknown slug, `/api/skills` categorized array, `/api/education` milestones, `/api/services`, and `/api/settings` (8 tests).
+    - `tests/contact.test.ts`: Contact submission API tests — missing name validation (400), invalid email format validation (400), short message length enforcement (400), anti-spam honeypot silent handling without DB pollution (201), and valid submission with asynchronous notification dispatch (201) (5 tests).
+    - Total Backend Test Results: **4 test files passed, 19 tests passed (100% pass rate)**.
+  - **Frontend Test Suite (Vitest):**
+    - Installed `vitest` in `frontend/`.
+    - Added npm test script: `"test": "vitest run"` in `frontend/package.json`.
+    - `src/utils/cn.test.ts`: Comprehensive tests for the custom Tailwind CSS `cn` class merger — merging class names, resolving conflicts with last-win rule, and ignoring conditional falsy values (3 tests).
+    - Total Frontend Test Results: **1 test file passed, 3 tests passed (100% pass rate)**.
+  - **Production Builds:**
+    - Verified clean TypeScript compilation and zero bundle warnings on both ends (`npm run build`).
+
+---
+
+## Current Branch
+`feature/portfolio-api`
+
+## Current Implementation Status
+Phase 14 (Testing & Quality Assurance) is complete and verified. The backend features a comprehensive 19-test suite running across health, auth, public APIs, and contact inquiries with full database integration. The frontend has a verified Vitest setup with utility unit tests. Both applications build cleanly with zero errors.
+
+---
 
 ## Remaining Work (Phases Ahead)
-- **Phase 7:** Public Portfolio UI (Wire Hero, About, Skills, Projects, Education, Services, Contact, Footer to backend APIs with TanStack Query)
-- **Phase 8:** Admin Dashboard UI (Sidebar, Overview metrics, CRUD tables and modals for Projects, Skills, Education, Services, Messages, Settings)
-- **Phase 9:** Media Management (ImageKit integration & upload endpoints/UI)
-- **Phase 10:** Contact & Email System (Contact form submission, rate limiting, spam check, Nodemailer notifications)
-- **Phase 11:** Integration & End-to-End Wiring
-- **Phase 12:** Animations & UI Polish (Framer Motion, responsive polish, accessibility)
-- **Phase 13:** Security Hardening (Helmet, CORS, rate-limiting, sanitize input)
-- **Phase 14:** Testing & Quality Assurance
-- **Phase 15:** Performance, SEO, Accessibility Audit
-- **Phase 16:** Production Deployment Preparation
+- **Phase 15:** Performance, SEO & Accessibility Audit (Lighthouse readiness, metadata check, semantic structure)
+- **Phase 16:** Production Deployment Preparation (Docker/env checklist, build scripts, production readiness)
+
+---
 
 ## Next Recommended Phase
-**Phase 7: Public Portfolio UI**
-Connect the React frontend public views to the backend REST APIs:
-- Set up API client services with Axios in `frontend/src/services/api.ts`.
-- Wire dynamic data into:
-  - Hero section (dynamic title, about bio, download CV button, social links)
-  - About section (dynamic bio and university education background)
-  - Skills section (categorized skills with active badges)
-  - Projects section (real projects cards with live links, GitHub buttons, image zoom)
-  - Education section (timeline with dates and institution)
-  - Services section (dynamic services cards with numbering)
-  - Footer (dynamic social links, email, copyright)
-- Add loading states, empty states, and TanStack Query caching.
+**Phase 15: Performance, SEO & Accessibility Audit**
+Audit Lighthouse performance, verify semantic HTML structures, review color contrast, ensure OpenGraph and Twitter cards are properly configured, and optimize asset delivery.
+
+---
 
 ## How to Run / Verify Current Implementation
 ```bash
-# In backend directory:
+# 1. Run Backend Tests:
 cd backend
+npm test
 
-# Compile TypeScript:
-npm run build
+# 2. Run Frontend Tests:
+cd frontend
+npm test
 
-# Start server:
-npm run dev
-
-# Test public projects endpoint:
-curl http://localhost:5000/api/projects
+# 3. Test Production Builds:
+cd backend && npm run build
+cd ../frontend && npm run build
 ```
+
+
+

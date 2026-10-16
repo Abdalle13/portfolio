@@ -67,7 +67,7 @@ export const HomePage: React.FC = () => {
 
 
   return (
-    <div className="space-y-4">
+    <main id="main-content" role="main" className="space-y-4">
       {/* 1. Hero Section */}
       <HeroSection
         profile={profile}
@@ -104,6 +104,6 @@ export const HomePage: React.FC = () => {
 
       {/* 7. Contact Inquiries */}
       <ContactSection profile={profile} />
-    </div>
+    </main>
   );
 };

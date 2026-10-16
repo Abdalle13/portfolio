@@ -2,20 +2,90 @@
 <html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Abdalle Hussein - Full-Stack Developer portfolio showcasing modern, scalable web applications, projects, and engineering experience." />
-    <title>Abdalle Hussein | Full-Stack Developer</title>
 
-    <!-- Google Fonts: Inter -->
+    <!-- Primary Meta -->
+    <title>Abdalle Hussein | Full-Stack Developer</title>
+    <meta name="description" content="Abdalle Hussein - Full-Stack Developer specializing in modern, scalable web applications. Based in Mogadishu, Somalia. View my projects, skills, and experience." />
+    <meta name="author" content="Abdalle Hussein" />
+    <meta name="keywords" content="Abdalle Hussein, Full-Stack Developer, React, Node.js, TypeScript, Web Developer, Somalia, Portfolio" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://abdalle.dev/" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://abdalle.dev/" />
+    <meta property="og:title" content="Abdalle Hussein | Full-Stack Developer" />
+    <meta property="og:description" content="Full-Stack Developer specializing in React, Node.js, and TypeScript. Building practical, reliable web applications that solve real-world problems." />
+    <meta property="og:image" content="https://abdalle.dev/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Abdalle Hussein - Full-Stack Developer Portfolio" />
+    <meta property="og:site_name" content="Abdalle Hussein Portfolio" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://abdalle.dev/" />
+    <meta name="twitter:title" content="Abdalle Hussein | Full-Stack Developer" />
+    <meta name="twitter:description" content="Full-Stack Developer specializing in React, Node.js, and TypeScript. Building practical, reliable web applications." />
+    <meta name="twitter:image" content="https://abdalle.dev/og-image.png" />
+    <meta name="twitter:image:alt" content="Abdalle Hussein - Full-Stack Developer Portfolio" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Google Fonts: Inter (performance-optimized) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Abdalle Hussein",
+      "url": "https://abdalle.dev",
+      "sameAs": [
+        "https://github.com/Abdalle13",
+        "https://linkedin.com/in/abdalle-hussein"
+      ],
+      "jobTitle": "Full-Stack Developer",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Freelance"
+      },
+      "alumniOf": {
+        "@type": "EducationalOrganization",
+        "name": "Jamhuriya University of Science and Technology"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Mogadishu",
+        "addressCountry": "SO"
+      },
+      "description": "Full-Stack Developer specializing in React, Node.js, and TypeScript, building practical and scalable web applications."
+    }
+    </script>
   </head>
   <body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50 transition-colors duration-200 antialiased selection:bg-primary-500 selection:text-white">
+    <!-- Skip to main content for screen readers / keyboard users -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-md focus:font-semibold focus:outline-none focus:ring-2 focus:ring-white"
+    >
+      Skip to main content
+    </a>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

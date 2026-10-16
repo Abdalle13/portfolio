@@ -105,62 +105,30 @@ export const deleteMessage = async (req: Request, res: Response): Promise<Respon
 /**
  * Public: Send contact message
  * POST /api/contact
+ * Body is pre-validated and sanitised by validateContact middleware (Zod).
  */
 export const createPublicMessage = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { name, email, message, honeypot, website } = req.body;
 
-    // Honeypot check: Bots usually auto-fill hidden input fields
+    // Honeypot check: bots usually auto-fill hidden fields
     if (honeypot || website) {
-      console.warn('[Message Controller] Honeypot field triggered. Silently ignoring bot submission.');
+      console.warn('[Message Controller] Honeypot triggered — silently dropping bot submission.');
       return sendSuccess(res, 201, 'Your message has been received! Thank you for reaching out.', {
         id: 'mock-bot-id',
       });
     }
 
-    if (!name || typeof name !== 'string' || !name.trim()) {
-      return sendError(res, 400, 'Please provide your name.');
-    }
-
-    if (!email || typeof email !== 'string' || !email.trim()) {
-      return sendError(res, 400, 'Please provide your email address.');
-    }
-
-    if (!message || typeof message !== 'string' || !message.trim()) {
-      return sendError(res, 400, 'Please provide a message.');
-    }
-
-    const trimmedName = name.trim();
-    const trimmedEmail = email.trim().toLowerCase();
-    const trimmedMessage = message.trim();
-
-    if (trimmedName.length > 100) {
-      return sendError(res, 400, 'Name must be under 100 characters.');
-    }
-
-    if (trimmedMessage.length < 5) {
-      return sendError(res, 400, 'Message must be at least 5 characters long.');
-    }
-
-    if (trimmedMessage.length > 5000) {
-      return sendError(res, 400, 'Message cannot exceed 5000 characters.');
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(trimmedEmail)) {
-      return sendError(res, 400, 'Please provide a valid email address.');
-    }
-
-    // 1. Save message to MongoDB
+    // Save message to MongoDB (values already trimmed & validated by Zod)
     const newMessage = await Message.create({
-      name: trimmedName,
-      email: trimmedEmail,
-      message: trimmedMessage,
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      message: message.trim(),
       read: false,
       status: 'unread',
     });
 
-    // 2. Dispatch email notification asynchronously (non-blocking)
+    // Dispatch email notification asynchronously (non-blocking)
     sendContactNotification({
       id: newMessage._id.toString(),
       name: newMessage.name,
@@ -179,5 +147,3 @@ export const createPublicMessage = async (req: Request, res: Response): Promise<
     return sendError(res, 500, 'Failed to send message. Please try again later.');
   }
 };
-
-

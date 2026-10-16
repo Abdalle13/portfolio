@@ -88,7 +88,7 @@ export const Navbar: React.FC = () => {
 
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2" aria-label="Main navigation">
             {navItems.map((item) => {
               const isActive = activeSection === item.href.substring(1);
               return (
@@ -99,6 +99,7 @@ export const Navbar: React.FC = () => {
                     e.preventDefault();
                     handleNavClick(item.href);
                   }}
+                  aria-current={isActive ? 'location' : undefined}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive
                       ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950/40'
@@ -159,10 +160,12 @@ export const Navbar: React.FC = () => {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle navigation menu"
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
               className="p-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
             </button>
           </div>
         </div>
@@ -170,8 +173,11 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-200 dark:border-slate-800 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-xl transition-all">
-          <div className="px-4 pt-2 pb-6 space-y-1">
+        <div
+          id="mobile-menu"
+          className="md:hidden border-b border-slate-200 dark:border-slate-800 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-xl transition-all"
+        >
+          <nav className="px-4 pt-2 pb-6 space-y-1" aria-label="Mobile navigation">
             {navItems.map((item) => {
               const isActive = activeSection === item.href.substring(1);
               return (
@@ -182,6 +188,7 @@ export const Navbar: React.FC = () => {
                     e.preventDefault();
                     handleNavClick(item.href);
                   }}
+                  aria-current={isActive ? 'location' : undefined}
                   className={`block px-3 py-2.5 rounded-lg text-base font-medium transition-colors ${
                     isActive
                       ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950/40'
@@ -203,10 +210,10 @@ export const Navbar: React.FC = () => {
                 className="w-full flex items-center justify-center px-4 py-2.5 text-base font-medium rounded-xl text-white bg-primary-600 hover:bg-primary-700 transition-colors shadow-sm"
               >
                 <span>Let's Talk</span>
-                <ArrowUpRight className="w-4 h-4 ml-1.5" />
+                <ArrowUpRight className="w-4 h-4 ml-1.5" aria-hidden="true" />
               </a>
             </div>
-          </div>
+          </nav>
         </div>
       )}
     </header>
