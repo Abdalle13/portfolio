@@ -12,7 +12,7 @@ The project consists of a high-performance modern public portfolio website and a
 ---
 
 ## Current Development Phase
-**Phase 14: Testing & Quality Assurance — COMPLETE**
+**Phase 15: Performance, SEO & Accessibility — COMPLETE**
 
 
 ## Completed Phases
