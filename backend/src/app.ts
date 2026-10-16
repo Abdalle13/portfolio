@@ -50,11 +50,9 @@ export const createApp = (): Application => {
   app.use(
     cors({
       origin: (origin, callback) => {
-        // Allow requests with no origin (Postman, server-to-server) only in dev
-        if (!origin) {
-          if (!env.isProduction) return callback(null, true);
-          return callback(new Error('No-origin requests are not allowed in production.'));
-        }
+        // Allow requests with no origin (direct browser visits, server-to-server, health checkers)
+        if (!origin) return callback(null, true);
+
         const isAllowed = (allowedOrigins as Array<string | RegExp>).some((o) =>
           typeof o === 'string' ? o === origin : o.test(origin)
         );
@@ -100,6 +98,17 @@ export const createApp = (): Application => {
 
   // Static Assets (uploads — served before API routes)
   app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
+
+  // Root status endpoint for browser check
+  app.get('/', (_req, res) => {
+    res.status(200).json({
+      success: true,
+      message: 'Abdalle Hussein Portfolio API is running smoothly.',
+      environment: env.NODE_ENV,
+      timestamp: new Date().toISOString(),
+      healthEndpoint: '/api/health',
+    });
+  });
 
   // 6. Mount API Routes
   app.use('/api', apiRoutes);

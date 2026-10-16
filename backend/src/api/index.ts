@@ -1,13 +1,13 @@
-/**
- * Vercel Serverless Entry Point
- * ─────────────────────────────
- * This file is the handler for Vercel serverless functions.
- * It connects to MongoDB once (cached across warm invocations)
- * and exports the Express app as the default handler.
- */
-
+import dns from 'dns';
 import mongoose from 'mongoose';
 import { createApp } from '../app';
+
+// DNS SRV resolution fallback for serverless environments
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch {
+  // Ignore if restricted
+}
 
 // Cache the db connection across serverless warm invocations
 let isConnected = false;
@@ -17,16 +17,21 @@ const connectDB = async (): Promise<void> => {
 
   const uri = process.env.DATABASE_URL;
   if (!uri) {
-    throw new Error('[DB] DATABASE_URL environment variable is not set.');
+    console.error('[DB] DATABASE_URL environment variable is missing.');
+    return;
   }
 
-  await mongoose.connect(uri, {
-    bufferCommands: false,
-    serverSelectionTimeoutMS: 10000,
-  });
-
-  isConnected = true;
-  console.log('[DB] Connected to MongoDB Atlas');
+  try {
+    await mongoose.connect(uri, {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000,
+    });
+    isConnected = true;
+    console.log('[DB] Connected to MongoDB Atlas');
+  } catch (err) {
+    console.error('[DB] MongoDB Atlas connection error in serverless handler:', err);
+    // Don't crash immediately; allow app to respond with error if needed
+  }
 };
 
 // Build the Express app
@@ -37,3 +42,4 @@ export default async function handler(req: any, res: any): Promise<void> {
   await connectDB();
   return app(req, res);
 }
+
