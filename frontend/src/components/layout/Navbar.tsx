@@ -54,6 +54,10 @@ export const Navbar: React.FC = () => {
 
   const handleNavClick = (href: string) => {
     setMobileMenuOpen(false);
+    if (window.location.pathname !== '/') {
+      window.location.href = '/' + href;
+      return;
+    }
     const target = document.querySelector(href);
     if (target) {
       target.scrollIntoView({ behavior: 'smooth' });
@@ -72,11 +76,16 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <a
-            href="#home"
+            href="/#home"
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavClick('#home');
+            }}
             className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50 transition-colors"
           >
             Abdalle<span className="text-primary-600">.</span>
           </a>
+
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">

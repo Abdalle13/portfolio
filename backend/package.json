@@ -25,8 +25,11 @@
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.0.0",
+    "imagekit": "^6.0.0",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.11.0"
+    "mongoose": "^9.11.0",
+    "multer": "^2.4.0",
+    "nodemailer": "^10.1.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
@@ -34,7 +37,9 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.3.0",
     "@types/node": "^22.13.5",
+    "@types/nodemailer": "^8.0.2",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3"
   }

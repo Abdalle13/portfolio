@@ -1,16 +1,33 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Lock, Mail, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
+import { Lock, Mail, ArrowLeft, ShieldCheck, AlertCircle } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 export const AdminLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  if (isAuthenticated) {
+    return <Navigate to="/admin" replace />;
+  }
+
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Foundation mockup: redirects to dashboard; Phase 5 will implement full API JWT authentication
-    navigate('/admin');
+    setError('');
+    setIsLoading(true);
+    try {
+      await login({ email, password });
+      navigate('/admin');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -39,9 +56,19 @@ export const AdminLoginPage: React.FC = () => {
             </p>
           </div>
 
+          {error && (
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label htmlFor="admin-email" className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
+              <label
+                htmlFor="admin-email"
+                className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5"
+              >
                 Admin Email
               </label>
               <div className="relative">
@@ -59,7 +86,10 @@ export const AdminLoginPage: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="admin-password" className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
+              <label
+                htmlFor="admin-password"
+                className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5"
+              >
                 Password
               </label>
               <div className="relative">
@@ -78,9 +108,10 @@ export const AdminLoginPage: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-xl font-semibold text-white bg-primary-600 hover:bg-primary-700 transition-colors shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              disabled={isLoading}
+              className="w-full py-3 px-4 rounded-xl font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
-              Sign In
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 

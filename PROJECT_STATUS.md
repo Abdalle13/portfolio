@@ -12,7 +12,7 @@ The project consists of a high-performance modern public portfolio website and a
 ---
 
 ## Current Development Phase
-**Phase 5: Authentication**
+**Phase 6: Portfolio APIs**
 
 ## Completed Phases
 - **Phase 1: Project Setup and Foundation**
@@ -86,53 +86,84 @@ The project consists of a high-performance modern public portfolio website and a
     - `POST /api/auth/logout` clears session.
   - Verified TypeScript compilation (`tsc`) with 0 errors.
 
+- **Phase 6: Portfolio APIs**
+  - Created URL slug utility (`backend/src/utils/slugify.ts`).
+  - Implemented public endpoints in `backend/src/routes/public.routes.ts`:
+    - `GET /api/profile`: returns singleton profile details.
+    - `GET /api/projects`: returns published projects sorted by `order: 1`.
+    - `GET /api/projects/:slug`: returns project details by slug.
+    - `GET /api/skills`: returns active skills grouped by category.
+    - `GET /api/education`: returns chronological education milestones.
+    - `GET /api/services`: returns active service offerings.
+    - `GET /api/settings`: returns public site configuration and SEO metadata.
+  - Implemented protected admin CRUD routes (`requireAuth`) in `backend/src/routes/admin.routes.ts`:
+    - Projects: `GET`, `POST`, `GET :id`, `PUT :id`, `DELETE :id` (`/api/admin/projects`).
+    - Skills: `GET`, `POST`, `PUT :id`, `DELETE :id` (`/api/admin/skills`).
+    - Education: `GET`, `POST`, `PUT :id`, `DELETE :id` (`/api/admin/education`).
+    - Services: `GET`, `POST`, `PUT :id`, `DELETE :id` (`/api/admin/services`).
+    - Messages: `GET`, `GET :id`, `PATCH :id/read`, `DELETE :id` (`/api/admin/messages`).
+    - Profile & Settings: `GET`, `PUT` (`/api/admin/profile`, `/api/admin/settings`).
+    - Dashboard: `GET /api/admin/dashboard` computing real database metrics (total projects, published, featured, skills, education, services, unread inquiries, recent items).
+  - Executed automated integration suite verifying:
+    - All 7 public endpoints return HTTP 200.
+    - Unauthenticated access to `/api/admin/dashboard` is blocked with HTTP 401.
+    - Admin login issues valid HTTP-only cookie.
+    - Admin can view real dashboard metrics.
+    - Admin can create, update, and delete projects.
+  - Verified clean TypeScript compilation (`tsc`) with 0 errors.
+
 ## Current Branch
-`feature/authentication`
+`feature/portfolio-api`
 
 ## Current Implementation Status
-Admin authentication is complete, secured, and verified at both compilation and runtime. The backend enforces authentication through encrypted HTTP-only cookies and bcrypt password hashing.
+All public and administrative CRUD APIs are implemented, strictly typed, secured, and thoroughly verified. The backend is completely ready to supply dynamic data to the frontend.
 
-## What Was Changed in Phase 5
-- Installed `jsonwebtoken` and `@types/jsonwebtoken`.
-- Created `backend/src/utils/jwt.ts`.
-- Created `backend/src/types/index.ts`.
-- Created `backend/src/middleware/auth.middleware.ts`.
-- Created `backend/src/validators/auth.validator.ts`.
-- Created `backend/src/controllers/auth.controller.ts`.
-- Created `backend/src/routes/auth.routes.ts`.
-- Mounted auth routes in `backend/src/routes/index.ts`.
-- Updated `backend/package.json` and `backend/package-lock.json`.
+## What Was Changed in Phase 6
+- Created `backend/src/utils/slugify.ts`.
+- Created `backend/src/controllers/project.controller.ts`.
+- Created `backend/src/controllers/skill.controller.ts`.
+- Created `backend/src/controllers/education.controller.ts`.
+- Created `backend/src/controllers/service.controller.ts`.
+- Created `backend/src/controllers/profile.controller.ts`.
+- Created `backend/src/controllers/setting.controller.ts`.
+- Created `backend/src/controllers/message.controller.ts`.
+- Created `backend/src/controllers/dashboard.controller.ts`.
+- Created `backend/src/routes/public.routes.ts`.
+- Created `backend/src/routes/admin.routes.ts`.
+- Updated `backend/src/routes/index.ts` to mount public and admin routes.
 - Updated `PROJECT_STATUS.md`.
 
 ## Important Technical Decisions
-- **HTTP-Only Cookie Authentication:** JWT tokens are stored in `httpOnly`, `sameSite`, and `secure` (in production) cookies. This completely prevents token theft via XSS vulnerabilities in the frontend.
-- **Brute-Force Rate Limiting:** Applied a dedicated 15-minute window rate limiter on the login endpoint in addition to global IP rate limits.
-- **Generic Error Responses:** Login failures return generic `"Invalid email or password."` messages to prevent user enumeration attacks.
+- **Unified Domain Controllers:** Controllers encapsulate both public retrieval and administrative CRUD actions with clear separation of permissions (`requireAuth`).
+- **Slug Generation & Collision Handling:** Slugs are automatically generated via `slugify()` on creation if not provided and checked for uniqueness across MongoDB.
+- **Zero Fake Analytics:** The `/api/admin/dashboard` endpoint calculates real numbers directly from MongoDB collections via `Promise.all([countDocuments(), ...])`.
 
-## Files Created in Phase 5
-- `backend/src/utils/jwt.ts`
-- `backend/src/types/index.ts`
-- `backend/src/middleware/auth.middleware.ts`
-- `backend/src/validators/auth.validator.ts`
-- `backend/src/controllers/auth.controller.ts`
-- `backend/src/routes/auth.routes.ts`
+## Files Created in Phase 6
+- `backend/src/utils/slugify.ts`
+- `backend/src/controllers/project.controller.ts`
+- `backend/src/controllers/skill.controller.ts`
+- `backend/src/controllers/education.controller.ts`
+- `backend/src/controllers/service.controller.ts`
+- `backend/src/controllers/profile.controller.ts`
+- `backend/src/controllers/setting.controller.ts`
+- `backend/src/controllers/message.controller.ts`
+- `backend/src/controllers/dashboard.controller.ts`
+- `backend/src/routes/public.routes.ts`
+- `backend/src/routes/admin.routes.ts`
 
-## Files Modified in Phase 5
-- `backend/package.json`
-- `backend/package-lock.json`
+## Files Modified in Phase 6
 - `backend/src/routes/index.ts`
 - `PROJECT_STATUS.md`
 
 ## In Progress
-None (Phase 5 complete and verified)
+None (Phase 6 complete and verified)
 
 ## Known Issues
 None.
 
 ## Remaining Work (Phases Ahead)
-- **Phase 6:** Portfolio APIs (Public & Admin CRUD endpoints for projects, skills, education, services, profile, settings, messages)
-- **Phase 7:** Public Portfolio UI (Hero, About, Skills, Projects, Education, Services, Contact, Footer, Theme toggle)
-- **Phase 8:** Admin Dashboard UI (Sidebar, Overview stats, CRUD interfaces for all resources)
+- **Phase 7:** Public Portfolio UI (Wire Hero, About, Skills, Projects, Education, Services, Contact, Footer to backend APIs with TanStack Query)
+- **Phase 8:** Admin Dashboard UI (Sidebar, Overview metrics, CRUD tables and modals for Projects, Skills, Education, Services, Messages, Settings)
 - **Phase 9:** Media Management (ImageKit integration & upload endpoints/UI)
 - **Phase 10:** Contact & Email System (Contact form submission, rate limiting, spam check, Nodemailer notifications)
 - **Phase 11:** Integration & End-to-End Wiring
@@ -143,37 +174,30 @@ None.
 - **Phase 16:** Production Deployment Preparation
 
 ## Next Recommended Phase
-**Phase 6: Portfolio APIs**
-Build public and administrative REST endpoints adhering to Section 23:
-- Public endpoints:
-  - `GET /api/profile`
-  - `GET /api/projects` & `GET /api/projects/:slug`
-  - `GET /api/skills`
-  - `GET /api/education`
-  - `GET /api/services`
-  - `GET /api/settings`
-- Admin CRUD endpoints (protected with `requireAuth`):
-  - Projects: `GET`, `POST`, `PUT`, `DELETE` (`/api/admin/projects`)
-  - Skills: `GET`, `POST`, `PUT`, `DELETE` (`/api/admin/skills`)
-  - Education: `GET`, `POST`, `PUT`, `DELETE` (`/api/admin/education`)
-  - Services: `GET`, `POST`, `PUT`, `DELETE` (`/api/admin/services`)
-  - Messages: `GET`, `GET :id`, `PATCH :id/read`, `DELETE :id` (`/api/admin/messages`)
-  - Profile & Settings: `GET`, `PUT` (`/api/admin/profile`, `/api/admin/settings`)
-  - Dashboard stats: `GET /api/admin/dashboard`
+**Phase 7: Public Portfolio UI**
+Connect the React frontend public views to the backend REST APIs:
+- Set up API client services with Axios in `frontend/src/services/api.ts`.
+- Wire dynamic data into:
+  - Hero section (dynamic title, about bio, download CV button, social links)
+  - About section (dynamic bio and university education background)
+  - Skills section (categorized skills with active badges)
+  - Projects section (real projects cards with live links, GitHub buttons, image zoom)
+  - Education section (timeline with dates and institution)
+  - Services section (dynamic services cards with numbering)
+  - Footer (dynamic social links, email, copyright)
+- Add loading states, empty states, and TanStack Query caching.
 
 ## How to Run / Verify Current Implementation
 ```bash
 # In backend directory:
 cd backend
 
-# Build TypeScript:
+# Compile TypeScript:
 npm run build
 
-# Start development server:
+# Start server:
 npm run dev
 
-# Test login:
-curl -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@abdalle.dev","password":"ChangeThisPasswordInProduction123!"}'
+# Test public projects endpoint:
+curl http://localhost:5000/api/projects
 ```

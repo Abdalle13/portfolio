@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -55,6 +56,9 @@ export const createApp = (): Application => {
     },
   });
   app.use('/api', globalLimiter);
+
+  // Static Assets (uploads)
+  app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
   // 5. Mount API Routes
   app.use('/api', apiRoutes);
