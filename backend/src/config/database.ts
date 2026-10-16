@@ -1,5 +1,13 @@
+import dns from 'dns';
 import mongoose from 'mongoose';
 import { env } from './env';
+
+// Fallback for Windows / ISP environments that reject DNS SRV queries
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch {
+  // Ignore in environments where setServers is restricted
+}
 
 export const connectDatabase = async (): Promise<typeof mongoose> => {
   try {

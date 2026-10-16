@@ -7,6 +7,14 @@
 
 import dotenv from 'dotenv';
 import path from 'path';
+import dns from 'dns';
+
+// Fallback for Windows / ISP environments that reject DNS SRV queries
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch {
+  // Ignore in environments where setServers is restricted
+}
 
 // Load .env before anything else
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
