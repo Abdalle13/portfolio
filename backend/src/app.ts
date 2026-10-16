@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import mongoose from 'mongoose';
 import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -121,3 +122,30 @@ export const createApp = (): Application => {
 
   return app;
 };
+
+// Cached connection for serverless executions
+let isServerlessConnected = false;
+const connectServerlessDB = async (): Promise<void> => {
+  if (isServerlessConnected && mongoose.connection.readyState === 1) return;
+  const uri = process.env.DATABASE_URL;
+  if (!uri) return;
+  try {
+    await mongoose.connect(uri, {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000,
+    });
+    isServerlessConnected = true;
+  } catch (err) {
+    console.error('[DB] Serverless connection error:', err);
+  }
+};
+
+// Singleton app instance for serverless invocations
+const appInstance = createApp();
+
+// Export default function handler for Vercel serverless function detection
+export default async function handler(req: any, res: any): Promise<void> {
+  await connectServerlessDB();
+  return (appInstance as any)(req, res);
+}
+
