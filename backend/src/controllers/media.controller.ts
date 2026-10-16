@@ -31,11 +31,20 @@ export const uploadMiddleware = multer({
   },
 });
 
-// Local fallback storage directory for offline development
-const LOCAL_UPLOADS_DIR = path.resolve(__dirname, '../../uploads');
-if (!fs.existsSync(LOCAL_UPLOADS_DIR)) {
-  fs.mkdirSync(LOCAL_UPLOADS_DIR, { recursive: true });
-}
+// Local fallback storage directory (use /tmp in serverless environments like Vercel)
+const LOCAL_UPLOADS_DIR = process.env.VERCEL
+  ? path.join('/tmp', 'uploads')
+  : path.resolve(__dirname, '../../uploads');
+
+const ensureLocalUploadsDir = (): void => {
+  try {
+    if (!fs.existsSync(LOCAL_UPLOADS_DIR)) {
+      fs.mkdirSync(LOCAL_UPLOADS_DIR, { recursive: true });
+    }
+  } catch (err) {
+    console.warn('[Storage] Read-only filesystem detected, skipping local folder creation.');
+  }
+};
 
 /**
  * Admin: Get ImageKit client-side upload authentication parameters
@@ -89,6 +98,7 @@ export const uploadMedia = async (req: Request, res: Response): Promise<Response
     }
 
     // 2. Local Fallback for offline development
+    ensureLocalUploadsDir();
     const safeFileName = `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`;
     const localFilePath = path.join(LOCAL_UPLOADS_DIR, safeFileName);
     fs.writeFileSync(localFilePath, file.buffer);
@@ -125,6 +135,10 @@ export const getMediaList = async (_req: Request, res: Response): Promise<Respon
     }
 
     // Local fallback file listing
+    if (!fs.existsSync(LOCAL_UPLOADS_DIR)) {
+      return sendSuccess(res, 200, 'Local media assets retrieved.', []);
+    }
+
     const localFiles = fs.readdirSync(LOCAL_UPLOADS_DIR).map((filename) => {
       const stats = fs.statSync(path.join(LOCAL_UPLOADS_DIR, filename));
       return {
