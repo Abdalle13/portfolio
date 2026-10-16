@@ -39,20 +39,26 @@ export const createApp = (): Application => {
   // 2. Cross-Origin Resource Sharing (CORS)
   // In production, restrict to the configured FRONTEND_URL; in dev also allow localhost
   const allowedOrigins = env.isProduction
-    ? [env.FRONTEND_URL]
+    ? [
+        env.FRONTEND_URL,                          // Primary production frontend URL from env
+        'https://abdalle.netlify.app',             // Netlify default subdomain (update after deploy)
+        /\.netlify\.app$/,                         // Any Netlify preview deploy
+        /\.vercel\.app$/,                          // Any Vercel preview deploy
+      ]
     : [env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
 
   app.use(
     cors({
       origin: (origin, callback) => {
-        // Allow requests with no origin (e.g. server-to-server, Postman) only in dev
+        // Allow requests with no origin (Postman, server-to-server) only in dev
         if (!origin) {
           if (!env.isProduction) return callback(null, true);
           return callback(new Error('No-origin requests are not allowed in production.'));
         }
-        if (allowedOrigins.includes(origin)) {
-          return callback(null, true);
-        }
+        const isAllowed = (allowedOrigins as Array<string | RegExp>).some((o) =>
+          typeof o === 'string' ? o === origin : o.test(origin)
+        );
+        if (isAllowed) return callback(null, true);
         return callback(new Error(`Origin ${origin} not allowed by CORS policy.`));
       },
       credentials: true,
